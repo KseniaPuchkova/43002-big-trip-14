@@ -8,13 +8,12 @@ import {createPointTemplate} from './view/point.js';
 import {createTotalPriceTemplate} from './view/total-price.js';
 import {generatePoints} from './mocks/point.js';
 import {generateFilters} from './mocks/filters.js';
-import {generateSortingTypes} from './mocks/sorting.js';
+import {SORT_TYPES} from './utils/const.js';
 import {getTotalPrice} from './utils/utils.js';
 
 const POINTS_COUNT = 3;
 const points = generatePoints(POINTS_COUNT);
 const filters = generateFilters();
-const typesOfsorting = generateSortingTypes();
 const totalPrice = getTotalPrice(points);
 
 const tripMainElement = document.querySelector('.trip-main');
@@ -33,7 +32,7 @@ render (tripInfoElement, createTotalPriceTemplate(totalPrice), 'beforeend');
 
 render (tripControlsElement, createSiteMenuTemplate(), 'beforeend');
 render (tripControlFiltersElement, createFiltersTemplate(filters), 'afterbegin');
-render (tripEventsElement, createSortingTemplate(typesOfsorting), 'afterbegin');
+render (tripEventsElement, createSortingTemplate(SORT_TYPES), 'afterbegin');
 render (tripEventsElement, createPointsListTemplate(), 'beforeend');
 
 const tripsListElement = tripEventsElement.querySelector('.trip-events__list');
