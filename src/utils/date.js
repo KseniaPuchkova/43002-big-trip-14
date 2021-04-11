@@ -41,4 +41,13 @@ const formatDiffDate = (start, end) => {
 
 };
 
-export {formatUTCDate, formatFullDate, formatYearMonthDay, formatMonthDay, formatEditYearMonthDay, formatTime, formatValueDate, formatDiffDate};
+export {
+  formatUTCDate,
+  formatFullDate,
+  formatYearMonthDay,
+  formatMonthDay,
+  formatEditYearMonthDay,
+  formatTime,
+  formatValueDate,
+  formatDiffDate
+};

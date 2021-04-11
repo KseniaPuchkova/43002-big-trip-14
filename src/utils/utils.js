@@ -21,14 +21,23 @@ const getShuffleArray = (array, min = 0, max = array.length) => {
 };
 
 
-const generateNewArray = (array, functionName, count = 1) => {
+const generateNewArray = (array1, array2) => {
   const newArray = [];
 
-  array.forEach((elem) => {
-    newArray[elem] = Array(count).fill().map(() => functionName);
+  array1.forEach((elem) => {
+    newArray[elem] = getShuffleArray(array2);
   });
 
   return newArray;
+};
+
+
+const generateNewObject = (city, functionName) => {
+  const newObject = {};
+
+  newObject[city] = functionName;
+
+  return newObject;
 };
 
 
@@ -48,4 +57,25 @@ const generateObjectKeys = (object) => {
 
 const getRandomLengthArray = (min, max) => new Array(getRandomIntegerNumber(min, max)).fill('');
 
-export {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateObjectKeys, getPreposition, getRandomLengthArray};
+
+const getTotalPrice = (array) => {
+  return array.reduce((totalAcc, point) => {
+    const price = point.offers.reduce((acc, offer) => acc + offer.price, 0);
+    const totalPrice = totalAcc + point.price + price;
+
+    return totalPrice;
+  }, 0);
+};
+
+export {
+  getRandomBoolean,
+  getRandomIntegerNumber,
+  getRandomArrayItem,
+  getShuffleArray,
+  generateNewArray,
+  generateNewObject,
+  generateObjectKeys,
+  getPreposition,
+  getTotalPrice,
+  getRandomLengthArray
+};

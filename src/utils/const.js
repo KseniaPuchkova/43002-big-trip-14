@@ -1,18 +1,3 @@
-const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sept',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
 const TRANSFERS = [
   'taxi',
   'bus',
@@ -51,14 +36,23 @@ const DESCRIPTIONS = [
 ];
 
 const OFFERS = [
-  {name: 'luggage', title: 'Add luggage', price: 30},
-  {name: 'comfort', title: 'Switch to comfort', price: 100},
-  {name: 'train', title: 'Travel by train', price: 140},
-  {name: 'meal', title: 'Add meal', price: 15},
-  {name: 'seats', ntitle: 'Choose seats', price: 5},
-  {name: 'tickets', title: 'Book tickets', price: 60},
+  {name: 'luggage', title: 'Add luggage'},
+  {name: 'comfort', title: 'Switch to comfort'},
+  {name: 'train', title: 'Travel by train'},
+  {name: 'meal', title: 'Add meal'},
+  {name: 'seats', title: 'Choose seats'},
+  {name: 'tickets', title: 'Book tickets'},
 ];
+
 const FILTERS = ['everything', 'future', 'past'];
+
+const SortType = {
+  DEFAULT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
+const SORT_TYPES = Object.values(SortType);
 
 const Description = {
   MIN: 0,
@@ -67,7 +61,7 @@ const Description = {
 
 const Offer = {
   MIN: 0,
-  MAX: 6,
+  MAX: 5,
 };
 
 const Photo = {
@@ -80,4 +74,17 @@ const Price = {
   MAX: 1000,
 };
 
-export {MONTHS, TRANSFERS, ACTIVITIES, CITIES, DESCRIPTIONS, OFFERS, FILTERS, Price, Offer, Photo, Description};
+export {
+  TRANSFERS,
+  ACTIVITIES,
+  CITIES,
+  DESCRIPTIONS,
+  OFFERS,
+  FILTERS,
+  SORT_TYPES,
+  SortType,
+  Price,
+  Offer,
+  Photo,
+  Description
+};

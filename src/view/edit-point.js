@@ -77,9 +77,9 @@ const createOfferListMarkup = (offers) => {
 
       return (
         `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-${index}" type="checkbox" name="event-offer-${title}">
-        <label class="event__offer-label" for="event-offer-${title}-${index}">
-          <span class="event__offer-title">${name}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${index}" type="checkbox" name="event-offer-${name}">
+        <label class="event__offer-label" for="event-offer-${name}-${index}">
+          <span class="event__offer-title">${title}</span>
           +
           €&nbsp;<span class="event__offer-price">${price}</span>
         </label>
@@ -121,7 +121,7 @@ const createEditPointTemplate = (point = {}) => {
   const activitiesList = createTypesMarkup(type, ACTIVITIES);
   const citiesMarkup = createCitiesMarkup();
   const offersListContainer = createOffersMarkup(offers);
-  const infoMarkup = generateInfoMarkup(...info);
+  const infoMarkup = generateInfoMarkup(info);
   const preposition = getPreposition(TRANSFERS, type);
   const rollUpButton = createRollUpButton(point);
 

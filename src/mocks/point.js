@@ -1,6 +1,16 @@
-import {TRANSFERS, ACTIVITIES, CITIES, DESCRIPTIONS, OFFERS, Price, Offer, Photo, Description} from '../utils/const.js';
-import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray} from '../utils/utils.js';
+import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Offer, Photo, Description} from '../utils/const.js';
+import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/utils.js';
 
+const generateOffers = () => {
+  const offers = OFFERS.map((offer) =>
+    ({
+      name: offer.name,
+      title: offer.title,
+      price: getRandomIntegerNumber(Offer.MIN, Offer.MAX),
+      isChecked: getRandomBoolean(),
+    }));
+  return offers;
+};
 
 const generatePhotos = (min, max) => {
   const photos = [];
@@ -42,9 +52,9 @@ const generatePoint = () => {
   const end = randomDate.endDate;
   const day = randomDate.startDate.toDateString().slice(4, 15);
   const type = getRandomArrayItem([...TRANSFERS, ...ACTIVITIES]);
-  const offers = generateNewArray([...TRANSFERS, ...ACTIVITIES], getRandomArrayItem(OFFERS), getRandomIntegerNumber(Offer.MIN, Offer.MAX))[type];
+  const offers = generateNewArray([...TRANSFERS, ...ACTIVITIES], generateOffers())[type];
   const city = getRandomArrayItem(CITIES);
-  const info = generateNewArray(CITIES, generateInfo())[city];
+  const info = generateNewObject(city, generateInfo())[city];
   const price = getRandomIntegerNumber(Price.MIN, Price.MAX);
   const isFavorite = getRandomBoolean();
 
