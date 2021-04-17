@@ -1,3 +1,5 @@
+import {createElement} from '../utils/utils.js';
+
 const createFilterMarkup = (filter) => {
   return (
     `<div class="trip-filters__filter">
@@ -14,7 +16,7 @@ const createFilterMarkup = (filter) => {
   );
 };
 
-export  const createFiltersTemplate = (filters) => {
+const createFiltersTemplate = (filters) => {
   const filtersList = filters.map((filter) => createFilterMarkup(filter)).join('\n');
 
   return (
@@ -24,3 +26,26 @@ export  const createFiltersTemplate = (filters) => {
     </form>`
   );
 };
+
+export default class EditPoint {
+  constructor(filters) {
+    this._filters = filters ;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFiltersTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

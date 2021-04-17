@@ -1,5 +1,9 @@
-const getRandomBoolean = () => Math.random() > 0.5;
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
 
+const getRandomBoolean = () => Math.random() > 0.5;
 
 const getRandomIntegerNumber = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -8,18 +12,15 @@ const getRandomIntegerNumber = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-
 const getRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length - 1);
 
   return array[randomIndex];
 };
 
-
 const getShuffleArray = (array, min = 0, max = array.length) => {
   return array.slice().sort(() => Math.random() - 0.5).slice(0, getRandomIntegerNumber(min, max));
 };
-
 
 const generateNewArray = (array1, array2) => {
   const newArray = [];
@@ -31,7 +32,6 @@ const generateNewArray = (array1, array2) => {
   return newArray;
 };
 
-
 const generateNewObject = (city, functionName) => {
   const newObject = {};
 
@@ -40,23 +40,7 @@ const generateNewObject = (city, functionName) => {
   return newObject;
 };
 
-
 const getPreposition = (array, type) => array.includes(type) ? 'to' : 'in';
-
-
-const generateObjectKeys = (object) => {
-  const objectKeys = [];
-
-  for (let i = 0; i <= 10; i++) {
-    objectKeys.push(getRandomArrayItem(Object.keys(object)));
-  }
-
-  return objectKeys;
-};
-
-
-const getRandomLengthArray = (min, max) => new Array(getRandomIntegerNumber(min, max)).fill('');
-
 
 const getTotalPrice = (array) => {
   return array.reduce((totalAcc, point) => {
@@ -67,6 +51,25 @@ const getTotalPrice = (array) => {
   }, 0);
 };
 
+function render(container, template, position) {
+  switch (position) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(template);
+      break;
+
+    case RenderPosition.BEFOREEND:
+      container.append(template);
+      break;
+  }
+}
+
+function createElement(template) {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+}
+
 export {
   getRandomBoolean,
   getRandomIntegerNumber,
@@ -74,8 +77,9 @@ export {
   getShuffleArray,
   generateNewArray,
   generateNewObject,
-  generateObjectKeys,
   getPreposition,
   getTotalPrice,
-  getRandomLengthArray
+  render,
+  createElement,
+  RenderPosition
 };

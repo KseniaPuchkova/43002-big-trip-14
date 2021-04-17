@@ -1,13 +1,15 @@
+import {createElement} from '../utils/utils.js';
 import {formatMonthDay} from '../utils/date.js';
 
 const getTripRoutes = (points) => {
   if (points.length <= 3) {
     return points.map((point) => point.city).join(' - ');
   }
+
   return points[0].city + ' - ... - ' + points[points.length - 1].city;
 };
 
-export const createTripInfoTemplate = (points) => {
+const createTripInfoTemplate = (points) => {
   if (!points.length) {
 
     return (
@@ -29,3 +31,27 @@ export const createTripInfoTemplate = (points) => {
     </section>`
   );
 };
+
+
+export default class TripInfo {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

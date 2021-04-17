@@ -1,5 +1,5 @@
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {getPreposition} from '../utils/utils.js';
+import {createElement, getPreposition} from '../utils/utils.js';
 import {TRANSFERS} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
@@ -20,7 +20,7 @@ const generateOffersMarkup = (offers) => {
 };
 
 const createPointTemplate = (point = {}) => {
-  const {type, city, start, end, price, offers} = point;
+  const {type, city, start, end, price, offers, isFavorite} = point;
   const offersList = generateOffersMarkup(offers);
   const preposition = getPreposition(TRANSFERS, type);
 
@@ -47,7 +47,7 @@ const createPointTemplate = (point = {}) => {
          <ul class="event__selected-offers">
            ${offersList}
          </ul>
-          <button class="event__favorite-btn event__favorite-btn--active" type="button">
+          <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''}" type="button">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
               <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -61,4 +61,26 @@ const createPointTemplate = (point = {}) => {
   );
 };
 
-export {createPointTemplate};
+export default class Point {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+

@@ -71,7 +71,7 @@ const Photo = {
 
 const Price = {
   MIN: 10,
-  MAX: 1000,
+  MAX: 500,
 };
 
 export {
