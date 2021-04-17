@@ -115,7 +115,7 @@ const createRollUpButton = (point) => {
 
 
 const createEditPointTemplate = (point = {}) => {
-  const {type, city, info, price, offers, start, end, isFavorite} = point;
+  const {type, city, info, price, offers, start, end} = point;
 
   const transfersList = createTypesMarkup(type, TRANSFERS);
   const activitiesList = createTypesMarkup(type, ACTIVITIES);
