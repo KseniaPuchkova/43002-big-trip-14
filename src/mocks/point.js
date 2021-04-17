@@ -1,4 +1,4 @@
-import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Offer, Photo, Description} from '../utils/const.js';
+import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Photo, Description} from '../utils/const.js';
 import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/utils.js';
 
 const generateOffers = () => {
@@ -6,7 +6,7 @@ const generateOffers = () => {
     ({
       name: offer.name,
       title: offer.title,
-      price: getRandomIntegerNumber(Offer.MIN, Offer.MAX),
+      price: getRandomIntegerNumber(Price.MIN, Price.MAX),
       isChecked: getRandomBoolean(),
     }));
   return offers;
