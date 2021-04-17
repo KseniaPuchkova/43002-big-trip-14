@@ -1,4 +1,4 @@
-const TRANSFERS = [
+export const TRANSFERS = [
   'taxi',
   'bus',
   'train',
@@ -8,20 +8,20 @@ const TRANSFERS = [
   'flight',
 ];
 
-const ACTIVITIES = [
+export const ACTIVITIES = [
   'check-in',
   'restaurant',
   'sightseeing',
 ];
 
-const CITIES = [
+export const CITIES = [
   'Amsterdam',
   'Geneva',
   'Chamonix',
   'Saint Petersburg',
 ];
 
-const DESCRIPTIONS = [
+export const DESCRIPTIONS = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   'Cras aliquet varius magna, non porta ligula feugiat eget.',
   'Fusce tristique felis at fermentum pharetra.',
@@ -35,7 +35,7 @@ const DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-const OFFERS = [
+export const OFFERS = [
   {name: 'luggage', title: 'Add luggage'},
   {name: 'comfort', title: 'Switch to comfort'},
   {name: 'train', title: 'Travel by train'},
@@ -44,47 +44,33 @@ const OFFERS = [
   {name: 'tickets', title: 'Book tickets'},
 ];
 
-const FILTERS = ['everything', 'future', 'past'];
+export const FILTERS = ['everything', 'future', 'past'];
 
-const SortType = {
+export const SortType = {
   DEFAULT: 'event',
   TIME: 'time',
   PRICE: 'price',
 };
 
-const SORT_TYPES = Object.values(SortType);
+export const SORT_TYPES = Object.values(SortType);
 
-const Description = {
+export const Description = {
   MIN: 0,
   MAX: 10,
 };
 
-const Offer = {
+export const Offer = {
   MIN: 0,
   MAX: 5,
 };
 
-const Photo = {
+export const Photo = {
   MIN: 0,
   MAX: 10,
 };
 
-const Price = {
+export const Price = {
   MIN: 10,
   MAX: 500,
 };
 
-export {
-  TRANSFERS,
-  ACTIVITIES,
-  CITIES,
-  DESCRIPTIONS,
-  OFFERS,
-  FILTERS,
-  SORT_TYPES,
-  SortType,
-  Price,
-  Offer,
-  Photo,
-  Description
-};
