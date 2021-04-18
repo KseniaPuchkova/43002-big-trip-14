@@ -1,5 +1,6 @@
+import AbstractView from './abstract.js';
 import {CITIES, TRANSFERS, ACTIVITIES} from '../utils/const.js';
-import {createElement, getPreposition} from '../utils/utils.js';
+import {getPreposition} from '../utils/utils.js';
 import {formatValueDate} from '../utils/date.js';
 
 const createCitiesMarkup = () => {
@@ -186,26 +187,35 @@ const createEditPointTemplate = (point = {}) => {
   );
 };
 
-export default class EditPoint {
+export default class EditPoint extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._editPointRollUpButtonClickHandler = this._editPointRollUpButtonClickHandler.bind(this);
+    this._editPointFormSubmitHandler = this._editPointFormSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEditPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editPointRollUpButtonClickHandler() {
+    this._callback.click();
   }
 
-  removeElement() {
-    this._element = null;
+  _editPointFormSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
+  }
+
+  setEditPointRollUpButtonClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._editPointRollUpButtonClickHandler);
+  }
+
+  setEditPointFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._editPointFormSubmitHandler);
   }
 }
 

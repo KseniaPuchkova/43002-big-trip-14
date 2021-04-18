@@ -1,5 +1,6 @@
+import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {createElement, getPreposition} from '../utils/utils.js';
+import {getPreposition} from '../utils/utils.js';
 import {TRANSFERS} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
@@ -61,26 +62,24 @@ const createPointTemplate = (point = {}) => {
   );
 };
 
-export default class Point {
+export default class Point extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._pointButtonClickHandler = this._pointButtonClickHandler.bind(this);
+  }
+
+  _pointButtonClickHandler() {
+    this._callback.click();
   }
 
   getTemplate() {
     return createPointTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setPointButtonClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._pointButtonClickHandler);
   }
 }
 

@@ -1,7 +1,7 @@
 import SiteMenuView from './view/site-menu.js';
 import TripInfoView  from './view/trip-info.js';
 import FiltersView  from './view/filters.js';
-import SortingView  from './view/sorting.js';
+import SortView  from './view/sort.js';
 import PointsListView  from './view/points-list.js';
 import EditPointView  from './view/edit-point.js';
 import PointView  from './view/point.js';
@@ -24,15 +24,15 @@ const tripEventsElement = document.querySelector('.trip-events');
 
 
 const renderPoint = (point) => {
-  const pointViewElement = new PointView(point).getElement();
-  const editPointViewElement = new EditPointView(point).getElement();
+  const pointViewElement = new PointView(point);
+  const editPointViewElement = new EditPointView(point);
 
   const replacePointToEdit = () => {
-    pointsListElement.replaceChild(editPointViewElement, pointViewElement);
+    pointsListElement.replaceChild(editPointViewElement.getElement(), pointViewElement.getElement());
   };
 
   const replaceEditToPoint = () => {
-    pointsListElement.replaceChild(pointViewElement, editPointViewElement);
+    pointsListElement.replaceChild(pointViewElement.getElement(), editPointViewElement.getElement());
   };
 
   const onEscKeyDown = (evt) => {
@@ -44,24 +44,27 @@ const renderPoint = (point) => {
     }
   };
 
-  pointViewElement.querySelector('.event__rollup-btn').addEventListener('click', () => {
+  const onPointRollUpButtonClick = () => {
     replacePointToEdit();
     document.addEventListener('keydown', onEscKeyDown);
-  });
+  };
 
-  editPointViewElement.querySelector('.event__rollup-btn').addEventListener('click', () => {
+  const onEditPointRollUpButtonClick = () => {
     replaceEditToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
-  });
+  };
 
-  editPointViewElement.querySelector('form').addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  const onEditPointFormSubmit = () => {
     replaceEditToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
-  });
+  };
+
+  pointViewElement.setPointButtonClickHandler(onPointRollUpButtonClick);
+  editPointViewElement.setEditPointRollUpButtonClickHandler(onEditPointRollUpButtonClick);
+  editPointViewElement.setEditPointFormSubmitHandler(onEditPointFormSubmit);
 
   const pointsListElement = tripEventsElement.querySelector('.trip-events__list');
-  render(pointsListElement, pointViewElement, RenderPosition.BEFOREEND);
+  render(pointsListElement, pointViewElement.getElement(), RenderPosition.BEFOREEND);
 };
 
 if (!points.length) {
@@ -76,7 +79,7 @@ if (!points.length) {
   render(tripControlsNavigationElement, new SiteMenuView().getElement(), RenderPosition.AFTERBEGIN);
   render(tripControlsFiltersElement, new FiltersView(filters).getElement(), RenderPosition.BEFOREEND);
 
-  render(tripEventsElement, new SortingView(SORT_TYPES).getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsElement, new SortView(SORT_TYPES).getElement(), RenderPosition.BEFOREEND);
   render(tripEventsElement, new PointsListView().getElement(), RenderPosition.BEFOREEND);
 
   points.forEach((point) => (renderPoint(point)));

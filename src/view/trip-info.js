@@ -1,4 +1,4 @@
-import {createElement} from '../utils/utils.js';
+import AbstractView from './abstract.js';
 import {formatMonthDay} from '../utils/date.js';
 
 const getTripRoutes = (points) => {
@@ -33,25 +33,13 @@ const createTripInfoTemplate = (points) => {
 };
 
 
-export default class TripInfo {
+export default class TripInfo extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
