@@ -1,5 +1,5 @@
 import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Photo, Description} from '../utils/const.js';
-import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/utils.js';
+import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/common.js';
 
 const generateOffers = () => {
   const offers = OFFERS.map((offer) =>
@@ -72,7 +72,7 @@ const generatePoint = () => {
   };
 };
 
-const generatePoints = (count) => new Array(count)
+const generatePoints = (count = 0) => new Array(count)
   .fill('')
   .map(generatePoint)
   .slice()
