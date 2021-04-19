@@ -10,28 +10,19 @@ const getTripRoutes = (points) => {
 };
 
 const createTripInfoTemplate = (points) => {
-  if (!points.length) {
-
-    return (
-      `<section class="trip-main__trip-info trip-info">
-         <div class="trip-info__main">
-           <h1 class="trip-info__title"></h1>
-           <p class="trip-info__dates"></p>
-         </div>
-      </section>`
-    );
-  }
+  const tripPoints = points ? getTripRoutes(points) : '';
+  const pointStart = points ? formatMonthDay(points[0].start) : '';
+  const pointEnd = points ? formatMonthDay(points[points.length - 1].end) : '';
 
   return (
     `<section class="trip-main__trip-info trip-info">
        <div class="trip-info__main">
-         <h1 class="trip-info__title">${getTripRoutes(points)}</h1>
-         <p class="trip-info__dates">${formatMonthDay(points[0].start)}&nbsp;&mdash;&nbsp;${formatMonthDay(points[points.length - 1].end)}</p>
+         <h1 class="trip-info__title">${tripPoints}</h1>
+         <p class="trip-info__dates">${pointStart}&nbsp;&mdash;&nbsp;${pointEnd}</p>
        </div>
     </section>`
   );
 };
-
 
 export default class TripInfo extends AbstractView {
   constructor(point) {

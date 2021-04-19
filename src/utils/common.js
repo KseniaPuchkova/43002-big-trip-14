@@ -1,8 +1,3 @@
-export const RenderPosition = {
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-};
-
 export const getRandomBoolean = () => Math.random() > 0.5;
 
 export const getRandomIntegerNumber = (a = 0, b = 1) => {
@@ -25,9 +20,7 @@ export const getShuffleArray = (array, min = 0, max = array.length) => {
 export const generateNewArray = (array1, array2) => {
   const newArray = [];
 
-  array1.forEach((elem) => {
-    newArray[elem] = getShuffleArray(array2);
-  });
+  array1.forEach((elem) => newArray[elem] = getShuffleArray(array2));
 
   return newArray;
 };
@@ -50,23 +43,3 @@ export const getTotalPrice = (array) => {
     return totalPrice;
   }, 0);
 };
-
-export const render = (container, template, position) => {
-  switch (position) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(template);
-      break;
-
-    case RenderPosition.BEFOREEND:
-      container.append(template);
-      break;
-  }
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement('div');
-  newElement.innerHTML = template;
-
-  return newElement.firstChild;
-};
-

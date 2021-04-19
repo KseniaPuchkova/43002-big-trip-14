@@ -10,9 +10,10 @@ import NoPointsView  from './view/no-points.js';
 import {generatePoints} from './mocks/point.js';
 import {generateFilters} from './mocks/filters.js';
 import {SORT_TYPES} from './utils/const.js';
-import {RenderPosition, render, getTotalPrice} from './utils/utils.js';
+import {getTotalPrice} from './utils/common.js';
+import {RenderPosition, render, replace} from './utils/render.js';
 
-const POINTS_COUNT = 3;
+const POINTS_COUNT = 5;
 const points = generatePoints(POINTS_COUNT);
 const filters = generateFilters();
 const totalPrice = getTotalPrice(points);
@@ -22,17 +23,16 @@ const tripControlsNavigationElement = tripMainElement.querySelector('.trip-contr
 const tripControlsFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 
-
 const renderPoint = (point) => {
   const pointViewElement = new PointView(point);
   const editPointViewElement = new EditPointView(point);
 
   const replacePointToEdit = () => {
-    pointsListElement.replaceChild(editPointViewElement.getElement(), pointViewElement.getElement());
+    replace(editPointViewElement, pointViewElement);
   };
 
   const replaceEditToPoint = () => {
-    pointsListElement.replaceChild(pointViewElement.getElement(), editPointViewElement.getElement());
+    replace(pointViewElement, editPointViewElement);
   };
 
   const onEscKeyDown = (evt) => {
@@ -44,43 +44,43 @@ const renderPoint = (point) => {
     }
   };
 
-  const onPointRollUpButtonClick = () => {
+  const onPointButtonClick = () => {
     replacePointToEdit();
     document.addEventListener('keydown', onEscKeyDown);
   };
 
-  const onEditPointRollUpButtonClick = () => {
+  const onEditPointButtonClick = () => {
     replaceEditToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   };
 
-  const onEditPointFormSubmit = () => {
+  const onEditPointSubmit = () => {
     replaceEditToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   };
 
-  pointViewElement.setPointButtonClickHandler(onPointRollUpButtonClick);
-  editPointViewElement.setEditPointRollUpButtonClickHandler(onEditPointRollUpButtonClick);
-  editPointViewElement.setEditPointFormSubmitHandler(onEditPointFormSubmit);
+  pointViewElement.setPointButtonClickHandler(onPointButtonClick);
+  editPointViewElement.setEditPointButtonClickHandler(onEditPointButtonClick);
+  editPointViewElement.setEditPointSubmitHandler(onEditPointSubmit);
 
   const pointsListElement = tripEventsElement.querySelector('.trip-events__list');
-  render(pointsListElement, pointViewElement.getElement(), RenderPosition.BEFOREEND);
+  render(pointsListElement, pointViewElement, RenderPosition.BEFOREEND);
 };
 
 if (!points.length) {
-  render(tripEventsElement, new NoPointsView().getElement(), RenderPosition.AFTERBEGIN);
+  render(tripEventsElement, new NoPointsView(), RenderPosition.AFTERBEGIN);
 
 } else {
-  render(tripMainElement, new TripInfoView(points).getElement(), RenderPosition.AFTERBEGIN);
+  render(tripMainElement, new TripInfoView(points), RenderPosition.AFTERBEGIN);
 
   const tripInfoElement = tripMainElement.querySelector('.trip-info');
-  render(tripInfoElement, new TotalPriceView(totalPrice).getElement(), RenderPosition.BEFOREEND);
+  render(tripInfoElement, new TotalPriceView(totalPrice), RenderPosition.BEFOREEND);
 
-  render(tripControlsNavigationElement, new SiteMenuView().getElement(), RenderPosition.AFTERBEGIN);
-  render(tripControlsFiltersElement, new FiltersView(filters).getElement(), RenderPosition.BEFOREEND);
+  render(tripControlsNavigationElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
+  render(tripControlsFiltersElement, new FiltersView(filters), RenderPosition.BEFOREEND);
 
-  render(tripEventsElement, new SortView(SORT_TYPES).getElement(), RenderPosition.BEFOREEND);
-  render(tripEventsElement, new PointsListView().getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsElement, new SortView(SORT_TYPES), RenderPosition.BEFOREEND);
+  render(tripEventsElement, new PointsListView(), RenderPosition.BEFOREEND);
 
   points.forEach((point) => (renderPoint(point)));
 }

@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {getPreposition} from '../utils/utils.js';
+import {getPreposition} from '../utils/common.js';
 import {TRANSFERS} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
