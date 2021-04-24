@@ -206,7 +206,6 @@ export default class EditPoint extends AbstractView {
   _editPointSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.submit(this._point);
-    console.log(this._point);
   }
 
   setEditPointButtonClickHandler(callback) {
