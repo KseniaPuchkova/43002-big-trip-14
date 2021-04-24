@@ -1,7 +1,7 @@
 import AbstractView from './abstract.js';
 import {formatMonthDay} from '../utils/date.js';
 
-const getTripRoutes = (points) => {
+const getTripPoint = (points) => {
   if (points.length <= 3) {
     return points.map((point) => point.city).join(' - ');
   }
@@ -10,15 +10,21 @@ const getTripRoutes = (points) => {
 };
 
 const createTripInfoTemplate = (points) => {
-  const tripPoints = points ? getTripRoutes(points) : '';
-  const pointStart = points ? formatMonthDay(points[0].start) : '';
-  const pointEnd = points ? formatMonthDay(points[points.length - 1].end) : '';
+  const tripPoints = points.length ? getTripPoint(points) : '';
+
+  const getStartEndPoints = () => {
+    if (!points.length) {
+      return `<p class="trip-info__dates">${''}</p>`;
+    }
+
+    return `<p class="trip-info__dates">${formatMonthDay(points[0].start)}&nbsp;&mdash;&nbsp;${formatMonthDay(points[points.length - 1].end)}</p>`;
+  };
 
   return (
     `<section class="trip-main__trip-info trip-info">
        <div class="trip-info__main">
          <h1 class="trip-info__title">${tripPoints}</h1>
-         <p class="trip-info__dates">${pointStart}&nbsp;&mdash;&nbsp;${pointEnd}</p>
+         ${getStartEndPoints()}
        </div>
     </section>`
   );
