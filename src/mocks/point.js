@@ -1,3 +1,4 @@
+import {nanoid} from 'nanoid';
 import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Photo, Description} from '../utils/const.js';
 import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/common.js';
 
@@ -59,7 +60,7 @@ const generatePoint = () => {
   const isFavorite = getRandomBoolean();
 
   return {
-    id: String(new Date() + Math.random()),
+    id: nanoid(),
     start,
     end,
     city,
