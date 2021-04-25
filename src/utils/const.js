@@ -47,12 +47,12 @@ export const OFFERS = [
 export const FILTERS = ['everything', 'future', 'past'];
 
 export const SortType = {
-  DEFAULT: 'event',
+  DEFAULT: 'day',
+  EVENT: 'event',
   TIME: 'time',
   PRICE: 'price',
+  OFFERS: 'offers',
 };
-
-export const SORT_TYPES = Object.values(SortType);
 
 export const Description = {
   MIN: 0,

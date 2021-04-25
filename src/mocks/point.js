@@ -73,10 +73,5 @@ const generatePoint = () => {
   };
 };
 
-const generatePoints = (count = 0) => new Array(count)
-  .fill('')
-  .map(generatePoint)
-  .slice()
-  .sort((a, b) => a.start - b.start);
+export const generatePoints = (count = 0) => new Array(count).fill('').map(generatePoint);
 
-export {generatePoints};

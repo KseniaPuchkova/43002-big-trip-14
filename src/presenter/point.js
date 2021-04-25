@@ -20,7 +20,7 @@ export default class Point {
     this._handlePointButtonClick = this._handlePointButtonClick.bind(this);
     this._handleEditPointButtonClick = this._handleEditPointButtonClick.bind(this);
     this._handleEditPointSubmit = this._handleEditPointSubmit.bind(this);
-    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handlePointFavoriteClick = this._handlePointFavoriteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -34,7 +34,7 @@ export default class Point {
     this._editPointComponent = new EditPointView(point);
 
     this._pointComponent.setPointButtonClickHandler(this._handlePointButtonClick);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._pointComponent.setPointFavoriteClickHandler(this._handlePointFavoriteClick);
     this._editPointComponent.setEditPointButtonClickHandler(this._handleEditPointButtonClick);
     this._editPointComponent.setEditPointSubmitHandler(this._handleEditPointSubmit);
 
@@ -86,7 +86,7 @@ export default class Point {
     document.removeEventListener('keydown', this._onEscKeyDown);
   }
 
-  _handleFavoriteClick() {
+  _handlePointFavoriteClick() {
     this._changeData(
       Object.assign({},this._point,{
         isFavorite: !this._point.isFavorite,
@@ -111,6 +111,6 @@ export default class Point {
 
   destroy() {
     remove(this._pointComponent);
-    remove(this._pointEditComponent);
+    remove(this._editPointComponent);
   }
 }
