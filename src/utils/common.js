@@ -1,3 +1,5 @@
+import {SortType} from '../utils/const.js';
+
 export const getRandomBoolean = () => Math.random() > 0.5;
 
 export const getRandomIntegerNumber = (a = 0, b = 1) => {
@@ -56,4 +58,23 @@ export const updateItem = (items, update) => {
     update,
     ...items.slice(index + 1),
   ];
+};
+
+
+export const getSortedItems = (items, sortType) => {
+  let sortedItems = [];
+
+  switch (sortType) {
+    case SortType.DEFAULT:
+      sortedItems = items.slice().sort((a, b) => a.start - b.start);
+      break;
+    case SortType.PRICE:
+      sortedItems = items.slice().sort((a, b) => b.price - a.price);
+      break;
+    case SortType.TIME:
+      sortedItems = items.slice().sort((a, b) => (b.end - b.start) - (a.end - a.start));
+      break;
+  }
+
+  return sortedItems;
 };

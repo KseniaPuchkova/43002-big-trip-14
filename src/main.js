@@ -18,13 +18,15 @@ const tripControlsNavigationElement = tripMainElement.querySelector('.trip-contr
 const tripControlsFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 
-render(tripMainElement, new TripInfoView(points), RenderPosition.AFTERBEGIN);
+if (points.length) {
+  render(tripMainElement, new TripInfoView(points), RenderPosition.AFTERBEGIN);
 
-const tripInfoElement = tripMainElement.querySelector('.trip-info');
-render(tripInfoElement, new TotalPriceView(totalPrice), RenderPosition.BEFOREEND);
+  const tripInfoElement = tripMainElement.querySelector('.trip-info');
+  render(tripInfoElement, new TotalPriceView(totalPrice), RenderPosition.BEFOREEND);
 
-render(tripControlsNavigationElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
-render(tripControlsFiltersElement, new FiltersView(filters), RenderPosition.BEFOREEND);
+  render(tripControlsNavigationElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
+  render(tripControlsFiltersElement, new FiltersView(filters), RenderPosition.BEFOREEND);
+}
 
 const tripPresenter = new TripPresenter(tripEventsElement);
 tripPresenter.init(points);
