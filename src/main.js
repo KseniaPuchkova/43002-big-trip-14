@@ -11,7 +11,7 @@ import {RenderPosition, render} from './utils/render.js';
 const POINTS_COUNT = 5;
 const points = generatePoints(POINTS_COUNT);
 const filters = generateFilters();
-const totalPrice = getTotalPrice(points);
+const totalPrice = getTotalPrice(points, points.offers);
 
 const tripMainElement = document.querySelector('.trip-main');
 const tripControlsNavigationElement = tripMainElement.querySelector('.trip-controls__navigation');

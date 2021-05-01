@@ -22,7 +22,7 @@ export default class Trip {
   }
 
   init(points) {
-    this._points = points;
+    this._points = points.slice();
     this._sortedPoints = getSortedItems(this._points, SortType.DEFAULT);
     this._renderTrip();
   }
@@ -47,7 +47,7 @@ export default class Trip {
   }
 
   _sortPoints(sortType) {
-    this._sortedPoints = getSortedItems(this._sortedPoints, sortType);
+    this._sortedPoints = getSortedItems(this._points, sortType);
     this._currentSortType = sortType;
   }
 

@@ -17,10 +17,10 @@ export default class Point {
     this._editPointComponent = null;
     this._mode = Mode.DEFAULT;
 
-    this._handlePointButtonClick = this._handlePointButtonClick.bind(this);
-    this._handleEditPointButtonClick = this._handleEditPointButtonClick.bind(this);
-    this._handleEditPointSubmit = this._handleEditPointSubmit.bind(this);
-    this._handlePointFavoriteClick = this._handlePointFavoriteClick.bind(this);
+    this._handleButtonOpenClick = this._handleButtonOpenClick.bind(this);
+    this._handleButtonCloseClick = this._handleButtonCloseClick.bind(this);
+    this._handleSubmit = this._handleSubmit.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -33,10 +33,10 @@ export default class Point {
     this._pointComponent = new PointView(point);
     this._editPointComponent = new EditPointView(point);
 
-    this._pointComponent.setPointButtonClickHandler(this._handlePointButtonClick);
-    this._pointComponent.setPointFavoriteClickHandler(this._handlePointFavoriteClick);
-    this._editPointComponent.setEditPointButtonClickHandler(this._handleEditPointButtonClick);
-    this._editPointComponent.setEditPointSubmitHandler(this._handleEditPointSubmit);
+    this._pointComponent.setButtonOpenClickHandler(this._handleButtonOpenClick);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._editPointComponent.setButtonCloseClickHandler(this._handleButtonCloseClick);
+    this._editPointComponent.setSubmitHandler(this._handleSubmit);
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
       render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -70,23 +70,24 @@ export default class Point {
     this._mode = Mode.DEFAULT;
   }
 
-  _handlePointButtonClick() {
+  _handleButtonOpenClick() {
     this._replacePointToEdit();
-    document.addEventListener('keydown', this._onEscKeyDown);
+    this._editPointComponent.reset(this._point);
+    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handleEditPointButtonClick() {
+  _handleButtonCloseClick() {
     this._replaceEditToPoint();
-    document.removeEventListener('keydown', this._onEscKeyDown);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handleEditPointSubmit(point) {
+  _handleSubmit(point) {
     this._changeData(point);
     this._replaceEditToPoint();
-    document.removeEventListener('keydown', this._onEscKeyDown);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handlePointFavoriteClick() {
+  _handleFavoriteClick() {
     this._changeData(
       Object.assign({},this._point,{
         isFavorite: !this._point.isFavorite,
@@ -95,9 +96,9 @@ export default class Point {
   }
 
   _escKeyDownHandler(evt) {
-    const isEscKey = evt.key === 'Escape' || evt.key === 'Esc';
-
-    if (isEscKey) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this._editPointComponent.reset(this._point);
       this._replaceEditToPoint();
       document.removeEventListener('keydown', this._onEscKeyDown);
     }

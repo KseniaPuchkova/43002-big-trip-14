@@ -6,8 +6,7 @@ import {TRANSFERS} from '../utils/const.js';
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
     return offers
-      .map((offer) => {
-        const {title, price} = offer;
+      .map(({title, price}) => {
         return (
           `<li class="event__offer">
             <span class="event__offer-title">${title}</span>
@@ -20,8 +19,7 @@ const generateOffersMarkup = (offers) => {
   return '';
 };
 
-const createPointTemplate = (point = {}) => {
-  const {type, city, start, end, price, offers, isFavorite} = point;
+const createPointTemplate = ({type, city, start, end, price, offers, isFavorite} = {}) => {
   const offersList = generateOffersMarkup(offers);
   const preposition = getPreposition(TRANSFERS, type);
 
@@ -63,34 +61,34 @@ const createPointTemplate = (point = {}) => {
 };
 
 export default class Point extends AbstractView {
-  constructor(point) {
+  constructor(data) {
     super();
-    this._point = point;
-    this._pointButtonClickHandler = this._pointButtonClickHandler.bind(this);
-    this._pointFavoriteClickHandler = this._pointFavoriteClickHandler.bind(this);
+    this._data = data;
+    this._buttonOpenClickHandler = this._buttonOpenClickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
-  _pointButtonClickHandler() {
+  _buttonOpenClickHandler() {
     this._callback.click();
   }
 
-  _pointFavoriteClickHandler(evt) {
+  _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.pointFavoriteClick();
   }
 
   getTemplate() {
-    return createPointTemplate(this._point);
+    return createPointTemplate(this._data);
   }
 
-  setPointButtonClickHandler(callback) {
+  setButtonOpenClickHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._pointButtonClickHandler);
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonOpenClickHandler);
   }
 
-  setPointFavoriteClickHandler(callback) {
+  setFavoriteClickHandler(callback) {
     this._callback.pointFavoriteClick = callback;
-    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._pointFavoriteClickHandler);
+    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
   }
 }
 

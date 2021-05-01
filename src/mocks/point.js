@@ -2,7 +2,7 @@ import {nanoid} from 'nanoid';
 import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Photo, Description} from '../utils/const.js';
 import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/common.js';
 
-const generateOffers = () => {
+export const generateOffers = () => {
   const offers = OFFERS.map((offer) =>
     ({
       name: offer.name,
@@ -22,7 +22,7 @@ const generatePhotos = (min, max) => {
   return photos;
 };
 
-const generateInfo = () => {
+export const generateInfo = () => {
   return {
     description: getShuffleArray(DESCRIPTIONS, Description.MIN, Description.MAX).join(' '),
     photos: generatePhotos(Photo.MIN, Photo.MAX),
@@ -47,7 +47,7 @@ const generateRandomDate = () => {
   return {startDate, endDate};
 };
 
-const generatePoint = () => {
+export const generatePoint = () => {
   const randomDate = generateRandomDate();
   const start = randomDate.startDate;
   const end = randomDate.endDate;
@@ -58,6 +58,7 @@ const generatePoint = () => {
   const info = generateNewObject(city, generateInfo())[city];
   const price = getRandomIntegerNumber(Price.MIN, Price.MAX);
   const isFavorite = getRandomBoolean();
+
 
   return {
     id: nanoid(),
@@ -74,4 +75,3 @@ const generatePoint = () => {
 };
 
 export const generatePoints = (count = 0) => new Array(count).fill('').map(generatePoint);
-
