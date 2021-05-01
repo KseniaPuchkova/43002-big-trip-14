@@ -37,8 +37,8 @@ export const generateNewObject = (city, functionName) => {
 
 export const getPreposition = (array, type) => array.includes(type) ? 'to' : 'in';
 
-export const getTotalPrice = (array) => {
-  return array.reduce((totalAcc, point) => {
+export const getTotalPrice = (points = {}) => {
+  return points.reduce((totalAcc, point) => {
     const price = point.offers.reduce((acc, offer) => acc + offer.price, 0);
     const totalPrice = totalAcc + point.price + price;
 

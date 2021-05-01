@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 
-export const createTotalPriceTemplate = (totalPrice) => {
+export const createTotalPriceTemplate = (totalPrice = '') => {
   return (
     `<p class="trip-info__cost">
       Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalPrice}</span>
