@@ -90,7 +90,7 @@ const createOfferListMarkup = (offers) => {
       return (
         `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${index}" type="checkbox" name="event-offer-${name}" ${isChecked ? 'checked' : ''}>
-        <label class="event__offer-label" for="event-offer-${name}-${index}">
+        <label class="event__offer-label" for="event-offer-${title}" data-title="${title}">
           <span class="event__offer-title">${title}</span>
           +
           €&nbsp;<span class="event__offer-price">${price}</span>
@@ -125,7 +125,7 @@ const createRollUpButton = (point) => {
 };
 
 
-const createEditPointTemplate = (data = BLANK_POINT) => {
+const createEditPointTemplate = (data = {}) => {
   const {type, city, info, price, offers, start, end, isOffers} = data;
 
   const transfersList = createTypesMarkup(type, TRANSFERS);
@@ -202,9 +202,9 @@ export default class EditPoint extends SmartView {
     super();
     this._data = data;
     this._stateData = EditPoint.parseDataToState(data);
+    this._offers = this._stateData.offers.slice();
     this._startDatepicker = null;
     this._endDatepicker = null;
-    this._datepicker = null;
 
     this._buttonCloseClickHandler = this._buttonCloseClickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -226,9 +226,7 @@ export default class EditPoint extends SmartView {
 
   _setInnerHandlers() {
     if (this._stateData.isOffers) {
-      Array.from(this.getElement().querySelectorAll('.event__offer-checkbox')).forEach((offer) => {
-        offer.addEventListener('click', this._offerCheckboxChangeHandler);
-      });
+      this.getElement().querySelector('.event__available-offers').addEventListener('click', this._offersChangeHandler);
     }
     this.getElement().querySelector('.event__type-list').addEventListener('change', this._typeChangeHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._cityChangeHandler);
@@ -270,7 +268,7 @@ export default class EditPoint extends SmartView {
         dateFormat: 'd/m/y H:i',
         altFormat: 'd/m/y H:i',
         defaultDate: this._stateData.end,
-        minDate: this._stateData.start || new Date(),
+        minDate: this._stateData.start,
         onChange: this._endDateChangeHandler,
       },
     );
@@ -284,9 +282,9 @@ export default class EditPoint extends SmartView {
     this._endDatepicker.set('minDate', userDate);
     this._endDatepicker.set('minTime', userDate);
 
-    if (this._datepicker <= userDate || !this._stateData) {
+    if (this._stateData.start <= userDate) {
       this._endDatepicker.setDate(userDate);
-      this._datepicker = userDate;
+      this._stateData.start = userDate;
 
       this.updateState({
         start: userDate,
@@ -302,14 +300,16 @@ export default class EditPoint extends SmartView {
 
   _offersChangeHandler(evt) {
     event.preventDefault();
-    this.updateState(
-      {
-        offerIdsMap: Object.assign(
-          {},
-          this._data.offerIdsMap, {
-            [evt.target.value]: evt.target.checked,
-          }),
-      }, true);
+
+    if (evt.target.closest('.event__offer-label')) {
+      const title = evt.target.closest('.event__offer-label').dataset.title;
+      const index = this._stateData.offers.findIndex((offer) => offer.title === title);
+      this._offers[index].isChecked = !this._offers[index].isChecked;
+
+      this.updateState({
+        offers: this._offers,
+      }, false);
+    }
   }
 
   _typeChangeHandler(evt) {
