@@ -1,5 +1,6 @@
 import EditPointView  from '../view/edit-point.js';
 import PointView  from '../view/point.js';
+import {UserAction, UpdateType} from '../utils/const.js';
 import {RenderPosition, render, replace, remove} from '../utils/render.js';
 
 const Mode = {
@@ -19,7 +20,8 @@ export default class Point {
 
     this._handleButtonOpenClick = this._handleButtonOpenClick.bind(this);
     this._handleButtonCloseClick = this._handleButtonCloseClick.bind(this);
-    this._handleSubmit = this._handleSubmit.bind(this);
+    this._handleButtonDeleteClick = this._handleButtonDeleteClick.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
@@ -35,8 +37,9 @@ export default class Point {
 
     this._pointComponent.setButtonOpenClickHandler(this._handleButtonOpenClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
     this._editPointComponent.setButtonCloseClickHandler(this._handleButtonCloseClick);
-    this._editPointComponent.setSubmitHandler(this._handleSubmit);
+    this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
       render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -81,14 +84,28 @@ export default class Point {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handleSubmit(point) {
-    this._changeData(point);
+  _handleButtonDeleteClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  }
+
+  _handleFormSubmit(point) {
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
     this._replaceEditToPoint();
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
       Object.assign({},this._point,{
         isFavorite: !this._point.isFavorite,
       }),
@@ -100,7 +117,7 @@ export default class Point {
       evt.preventDefault();
       this._editPointComponent.reset(this._point);
       this._replaceEditToPoint();
-      document.removeEventListener('keydown', this._onEscKeyDown);
+      document.removeEventListener('keydown', this._escKeyDownHandler);
     }
   }
 

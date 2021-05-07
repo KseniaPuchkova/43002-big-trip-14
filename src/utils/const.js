@@ -19,6 +19,11 @@ export const CITIES = [
   'Geneva',
   'Chamonix',
   'Saint Petersburg',
+  'Moscow',
+  'Madrid',
+  'Milan',
+  'Athens',
+  'Vienna',
 ];
 
 export const DESCRIPTIONS = [
@@ -44,7 +49,11 @@ export const OFFERS = [
   {name: 'tickets', title: 'Book tickets'},
 ];
 
-export const FILTERS = ['everything', 'future', 'past'];
+export const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
 
 export const SortType = {
   DEFAULT: 'day',
@@ -74,3 +83,14 @@ export const Price = {
   MAX: 500,
 };
 
+export const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};

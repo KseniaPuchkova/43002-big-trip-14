@@ -58,10 +58,12 @@ export const generatePoint = () => {
   const info = generateNewObject(city, generateInfo())[city];
   const price = getRandomIntegerNumber(Price.MIN, Price.MAX);
   const isFavorite = getRandomBoolean();
+  const isNew = false;
 
 
   return {
     id: nanoid(),
+    isNew,
     start,
     end,
     city,
