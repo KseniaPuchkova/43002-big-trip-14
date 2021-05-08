@@ -2,31 +2,30 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
-import {CITIES, TRANSFERS, ACTIVITIES} from '../utils/const.js';
-import {generateNewArray, generateNewObject} from '../utils/common.js';
 import {formatValueDate} from '../utils/date.js';
-import {generateOffers, generateInfo} from '../mocks/point.js';
 
-const BLANK_POINT = {
-  start: new Date(),
-  end: new Date(),
-  city: 'Moscow',
-  type: 'taxi',
-  offers: [],
-  day: new Date(),
-  price: parseInt(0),
-  isFavorite: false,
-  info: {
-    description: [],
-    photos: [],
-  },
+const BLANK_DESTINATION = {
+  name: '',
+  description: '',
+  photos: [],
 };
 
-const createCitiesMarkup = () => {
-  return CITIES.map((city) => {
-    return `<option value="${city}"></option>`;
-  })
-    .join('\n');
+const BLANK_POINT = {
+  isNew: false,
+  start: new Date(),
+  end: new Date(),
+  type: 'taxi',
+  offers: [],
+  price: parseInt(0),
+  isFavorite: false,
+  destination: BLANK_DESTINATION,
+};
+
+
+const createDestinationsMarkup = (destinations) => {
+  return destinations.map((destination) => {
+    return `<option value="${destination}"></option>`;
+  }).join('\n');
 };
 
 const createPhotosListMarkup = (photo) => {
@@ -61,7 +60,9 @@ const createDescriptionMarkup = (description) => {
   );
 };
 
-const generateInfoMarkup = ({ description, photos }) => {
+const generateDestinationMarkup = (destination) => {
+  const {description, photos} = destination;
+
   if (!description.length && !photos.length) {
     return '';
   }
@@ -90,7 +91,7 @@ const createTypesMarkup = (activeType, types) => {
 
 const createOfferListMarkup = (offers) => {
   return offers
-    .map(({name, title, price, isChecked }, index) => {
+    .map(({name, title, price, isChecked}, index) => {
       return (
         `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${index}" type="checkbox" name="event-offer-${name}" ${isChecked ? 'checked' : ''}>
@@ -132,17 +133,16 @@ const createRollUpButton = (isPointNew) => {
   );
 };
 
-const createEditPointTemplate = (data = {}) => {
-  const {isNew, type, city, info, price, offers, start, end} = data;
+const createEditPointTemplate = (data = {}, destinationsNames, offersTypes) => {
+  const {isNew, type, destination, price, offers, start, end} = data;
 
-  const transfersList = createTypesMarkup(type, TRANSFERS);
-  const activitiesList = createTypesMarkup(type, ACTIVITIES);
-  const citiesMarkup = createCitiesMarkup();
+  const transfersList = createTypesMarkup(type, offersTypes.slice(0, 7));
+  const activitiesList = createTypesMarkup(type, offersTypes.slice(7, 10));
+  const destinationsList = createDestinationsMarkup(destinationsNames);
+  const destinationMarkup = generateDestinationMarkup(destination);
   const offersListContainer = createOffersMarkup(offers);
-  const infoMarkup = generateInfoMarkup(info);
-  const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
+  const preposition = offersTypes.slice(0, 6).includes(type) ? 'to' : 'in';
   const rollUpButton = createRollUpButton(isNew);
-
 
   return (
     `<li class="trip-events__item">
@@ -169,9 +169,9 @@ const createEditPointTemplate = (data = {}) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type} ${preposition}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(city)}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${citiesMarkup}
+              ${destinationsList}
             </datalist>
           </div>
           <div class="event__field-group  event__field-group--time">
@@ -200,7 +200,7 @@ const createEditPointTemplate = (data = {}) => {
         </header>
         <section class="event__details">
           ${offersListContainer}
-          ${infoMarkup}
+          ${destinationMarkup}
         </section>
       </form>
     </li>`
@@ -208,10 +208,12 @@ const createEditPointTemplate = (data = {}) => {
 };
 
 export default class EditPoint extends SmartView {
-  constructor(data = BLANK_POINT) {
+  constructor(data = BLANK_POINT, destinationsNames, offersTypes) {
     super();
     this._data = data;
-    this._stateData = EditPoint.parseDataToState(data);
+    this._stateData = EditPoint.parseDataToState(this._data);
+    this._destinationsNames = destinationsNames;
+    this._offersTypes = offersTypes;
     this._startDatepicker = null;
     this._endDatepicker = null;
     this._currentUserDate = null;
@@ -222,7 +224,7 @@ export default class EditPoint extends SmartView {
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._typeChangeHandler = this._typeChangeHandler.bind(this);
-    this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
 
@@ -243,17 +245,7 @@ export default class EditPoint extends SmartView {
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._stateData);
-  }
-
-  _setInnerHandlers() {
-    if (this._stateData.offers.length) {
-      this.getElement().querySelectorAll('.event__offer-selector').forEach((offer) =>
-        offer.addEventListener('click', this._offersChangeHandler));
-    }
-    this.getElement().querySelector('.event__type-list').addEventListener('change', this._typeChangeHandler);
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._cityChangeHandler);
-    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
+    return createEditPointTemplate(this._stateData, this._destinationsNames, this._offersTypes);
   }
 
   _setStartDatepicker() {
@@ -323,9 +315,38 @@ export default class EditPoint extends SmartView {
     }, true);
   }
 
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+    const currentDestination = evt.target.value;
+    const isDestinationInList = this._destinationsNames.includes(currentDestination);
+    const destination = this._callback.destinationChange(currentDestination);
+
+    if (destination && isDestinationInList) {
+      evt.target.setCustomValidity('');
+      this.updateState({
+        destination,
+      }, false);
+    } else {
+      evt.target.setCustomValidity('Please select the city from the list');
+      return;
+    }
+  }
+
+  _typeChangeHandler(evt) {
+    evt.preventDefault();
+    const type = evt.target.textContent;
+    const offers = this._callback.typeChange(type);
+
+    if (offers) {
+      this.updateState({
+        type: evt.target.textContent,
+        offers: this._callback.typeChange(type),
+      }, true);
+    }
+  }
+
   _offersChangeHandler(evt) {
     evt.preventDefault();
-
     const title = evt.target.closest('label').dataset.title;
     const index = this._stateData.offers.findIndex((offer) => offer.title === title);
     const offers = this._stateData.offers.slice();
@@ -337,28 +358,6 @@ export default class EditPoint extends SmartView {
         offers[index].isChecked = !offers[index].isChecked,
       ),
     }, false);
-  }
-
-  _typeChangeHandler(evt) {
-    evt.preventDefault();
-    this.updateState({
-      type: evt.target.value,
-      offers: generateNewArray([...TRANSFERS, ...ACTIVITIES], generateOffers())[evt.target.value],
-    }, false);
-  }
-
-  _cityChangeHandler(evt) {
-    evt.preventDefault();
-    if (CITIES.find((city) => city === evt.target.value)) {
-      evt.target.setCustomValidity('');
-      this.updateState({
-        city: evt.target.value,
-        info: generateNewObject(evt.target.value, generateInfo())[evt.target.value],
-      }, false);
-    } else {
-      evt.target.setCustomValidity('Please select the city from the list');
-      return;
-    }
   }
 
   _priceInputHandler(evt) {
@@ -380,7 +379,7 @@ export default class EditPoint extends SmartView {
 
   _buttonDeleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(EditPoint.parseStateToDate(this._data));
+    this._callback.deleteClick(EditPoint.parseStateToDate(this._stateData));
   }
 
   _formSubmitHandler(evt) {
@@ -388,9 +387,17 @@ export default class EditPoint extends SmartView {
     this._callback.formSubmit(EditPoint.parseStateToDate(this._stateData));
   }
 
+  _setInnerHandlers() {
+    if (this._stateData.offers.length) {
+      this.getElement().querySelectorAll('.event__offer-selector').forEach((offer) =>
+        offer.addEventListener('click', this._offersChangeHandler));
+    }
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
+  }
+
   setButtonCloseClickHandler(callback) {
     this._callback.closeClick = callback;
-    if (!this._data.isNew) {
+    if (!this._stateData.isNew) {
       this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonCloseClickHandler);
     }
   }
@@ -398,6 +405,16 @@ export default class EditPoint extends SmartView {
   setButtonDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._buttonDeleteClickHandler);
+  }
+
+  setDestinationChangeHandler(callback) {
+    this._callback.destinationChange = callback;
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
+  }
+
+  setTypeChangeHandler(callback) {
+    this._callback.typeChange = callback;
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);
   }
 
   setFormSubmitHandler(callback) {
@@ -408,6 +425,8 @@ export default class EditPoint extends SmartView {
   restoreHandlers() {
     this.setButtonCloseClickHandler(this._callback.closeClick);
     this.setButtonDeleteClickHandler(this._callback.deleteClick);
+    this.setDestinationChangeHandler(this._callback.destinationChange);
+    this.setTypeChangeHandler(this._callback.typeChange);
     this.setFormSubmitHandler(this._callback.formSubmit);
     this._setInnerHandlers();
     this._setStartDatepicker();
@@ -426,16 +445,20 @@ export default class EditPoint extends SmartView {
       point,
       {
         offers: point.offers.map((obj) => ({ ...obj})),
-        info: point.info = {
-          description: point.info.description,
-          photos: point.info.photos,
+        destination: {
+          name: point.destination.name,
+          description: point.destination.description,
+          photos: point.destination.photos,
         },
       },
     );
   }
 
+
   static parseStateToDate(data) {
     data = Object.assign({}, data);
+
+    data.isNew = false;
 
     return data;
   }

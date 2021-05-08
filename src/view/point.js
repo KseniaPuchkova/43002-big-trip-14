@@ -1,6 +1,5 @@
 import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {TRANSFERS} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
@@ -18,9 +17,9 @@ const generateOffersMarkup = (offers) => {
   return '';
 };
 
-const createPointTemplate = ({type, city, start, end, price, offers, isFavorite} = {}) => {
+const createPointTemplate = ({type, start, end, destination, price, offers, isFavorite} = {}, offersTypes) => {
   const offersList = generateOffersMarkup(offers);
-  const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
+  const preposition = offersTypes.slice(0, 7).includes(type) ? 'to' : 'in';
 
   return (
     `<li class="trip-events__item">
@@ -29,7 +28,7 @@ const createPointTemplate = ({type, city, start, end, price, offers, isFavorite}
          <div class="event__type">
            <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
          </div>
-         <h3 class="event__title">${type} ${preposition} ${city}</h3>
+         <h3 class="event__title">${type} ${preposition} ${destination.name}</h3>
          <div class="event__schedule">
            <p class="event__time">
              <time class="event__start-time" datetime="${formatUTCDate(start)}">${formatTime(start)}</time>
@@ -60,9 +59,10 @@ const createPointTemplate = ({type, city, start, end, price, offers, isFavorite}
 };
 
 export default class Point extends AbstractView {
-  constructor(data) {
+  constructor(data, offersTypes) {
     super();
     this._data = data;
+    this._offersTypes = offersTypes;
     this._buttonOpenClickHandler = this._buttonOpenClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
@@ -77,7 +77,7 @@ export default class Point extends AbstractView {
   }
 
   getTemplate() {
-    return createPointTemplate(this._data);
+    return createPointTemplate(this._data, this._offersTypes);
   }
 
   setButtonOpenClickHandler(callback) {

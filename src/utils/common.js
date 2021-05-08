@@ -17,18 +17,3 @@ export const getShuffleArray = (array, min = 0, max = array.length) => {
   return array.slice().sort(() => Math.random() - 0.5).slice(0, getRandomIntegerNumber(min, max));
 };
 
-export const generateNewArray = (array1, array2) => {
-  const newArray = [];
-
-  array1.forEach((elem) => newArray[elem] = getShuffleArray(array2));
-
-  return newArray;
-};
-
-export const generateNewObject = (key, functionName) => {
-  const newObject = {};
-
-  newObject[key] = functionName;
-
-  return newObject;
-};

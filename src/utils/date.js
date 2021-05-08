@@ -40,3 +40,13 @@ export const formatDiffDate = (start, end) => {
   return `${days} ${hours} ${minutes}`;
 
 };
+
+export const areDatesEqual = (dateA, dateB) => {
+  return (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');
+};
+
+export const addDays = (date) => {
+  const day = 1;
+
+  return date.setDate(date.getDate() + day);
+};

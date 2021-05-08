@@ -3,10 +3,10 @@ import {formatMonthDay} from '../utils/date.js';
 
 export const getTripPoints = (points) => {
   if (points.length <= 3) {
-    return points.map((point) => point.city).join(' - ');
+    return points.map((point) => point.destination.name).join(' - ');
   }
 
-  return points[0].city + ' - ... - ' + points[points.length - 1].city;
+  return points[0].destination.name + ' - ... - ' + points[points.length - 1].destination.name;
 };
 
 export const getStartPoint = (points) => {
