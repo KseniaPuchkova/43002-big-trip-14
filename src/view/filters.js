@@ -1,39 +1,50 @@
-import AbstractView from './abstract.js';
+import Abstract from './abstract.js';
 
-const createFilterMarkup = (filter) => {
+const createFilterItemTemplate = (filter, currentFilterType) => {
+  const {type, name, count} = filter;
+
   return (
     `<div class="trip-filters__filter">
-      <input
-        id="filter-${filter.name}"
-        class="trip-filters__filter-input visually-hidden"
-        type="radio"
-        name="trip-filter"
-        value="${filter.name}"
-        ${filter.isChecked ? 'checked' : ''}
-      />
-      <label class="trip-filters__filter-label" for="filter-${filter.name}">${filter.name.toUpperCase()}</label>
+      <input id="filter-${name}" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="${name}"
+        ${type === currentFilterType ? 'checked' : ''}
+          ${count === 0 ? 'disabled' : ''}>
+      <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
     </div>`
   );
 };
 
-const createFiltersTemplate = (filters) => {
-  const filtersList = filters.map((filter) => createFilterMarkup(filter)).join('\n');
+export const createFiltersTemplate = (filters, currentFilterType) => {
+
+  const filterItemsTemplate = filters.map((filter) => createFilterItemTemplate(filter, currentFilterType)).join('');
 
   return (
     `<form class="trip-filters" action="#" method="get">
-      ${filtersList}
-      <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>`
+      ${filterItemsTemplate}
+        <button class="visually-hidden" type="submit">Accept filter</button>
+      </form>`
   );
 };
 
-export default class EditPoint extends AbstractView {
-  constructor(filters) {
+export default class Filters extends Abstract {
+  constructor(filters, currentFilterType) {
     super();
     this._filters = filters;
+    this._currentFilter = currentFilterType;
+
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
-    return createFiltersTemplate(this._filters);
+    return createFiltersTemplate(this._filters, this._currentFilter);
+  }
+
+  _filterTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  }
+
+  setFilterTypeChangeHandler(callback) {
+    this._callback.filterTypeChange = callback;
+    this.getElement().addEventListener('change', this._filterTypeChangeHandler);
   }
 }

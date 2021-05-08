@@ -1,33 +1,6 @@
 import {nanoid} from 'nanoid';
 import {TRANSFERS, ACTIVITIES, CITIES, OFFERS, DESCRIPTIONS, Price, Photo, Description} from '../utils/const.js';
-import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray, generateNewArray, generateNewObject} from '../utils/common.js';
-
-export const generateOffers = () => {
-  const offers = OFFERS.map((offer) =>
-    ({
-      name: offer.name,
-      title: offer.title,
-      price: getRandomIntegerNumber(Price.MIN, Price.MAX),
-      isChecked: getRandomBoolean(),
-    }));
-  return offers;
-};
-
-const generatePhotos = (min, max) => {
-  const photos = [];
-  new Array((getRandomIntegerNumber(min, max))).fill('').forEach(() => {
-    photos.push(`http://picsum.photos/300/150?r=${Math.random()}`);
-  });
-
-  return photos;
-};
-
-export const generateInfo = () => {
-  return {
-    description: getShuffleArray(DESCRIPTIONS, Description.MIN, Description.MAX).join(' '),
-    photos: generatePhotos(Photo.MIN, Photo.MAX),
-  };
-};
+import {getRandomBoolean, getRandomIntegerNumber, getRandomArrayItem, getShuffleArray} from '../utils/common.js';
 
 const generateRandomDate = () => {
   let startDate = new Date();
@@ -47,30 +20,75 @@ const generateRandomDate = () => {
   return {startDate, endDate};
 };
 
+const generatePhotos = (min, max) => {
+  const photos = [];
+  new Array((getRandomIntegerNumber(min, max))).fill('').forEach(() => {
+    photos.push(`http://picsum.photos/300/150?r=${Math.random()}`);
+  });
+
+  return photos;
+};
+
+export const generateDestination = (city) => {
+  const name = city ? city : getRandomArrayItem(CITIES);
+  const destination = {
+    name,
+    description: getShuffleArray(DESCRIPTIONS, Description.MIN, Description.MAX).join(' '),
+    photos: generatePhotos(Photo.MIN, Photo.MAX),
+  };
+
+  return destination;
+};
+
+export const generateDestinationsMap = () => {
+  const destinations = [];
+  CITIES.forEach((city) => destinations[city] = {
+    name: city,
+    description: getShuffleArray(DESCRIPTIONS, Description.MIN, Description.MAX).join(' '),
+    photos: generatePhotos(Photo.MIN, Photo.MAX),
+  });
+
+  return destinations;
+};
+
+export const generateOffersMap = (types) => {
+  const offers = [];
+
+  types.forEach((type) => offers[type] = getShuffleArray(OFFERS.map((offer) =>
+    ({
+      name: offer.name,
+      title: offer.title,
+      price: getRandomIntegerNumber(Price.MIN, Price.MAX),
+      isChecked: getRandomBoolean(),
+    }))));
+
+  return offers;
+};
+
 export const generatePoint = () => {
+  const id = nanoid();
   const randomDate = generateRandomDate();
   const start = randomDate.startDate;
   const end = randomDate.endDate;
-  const day = randomDate.startDate.toDateString().slice(4, 15);
   const type = getRandomArrayItem([...TRANSFERS, ...ACTIVITIES]);
-  const offers = generateNewArray([...TRANSFERS, ...ACTIVITIES], generateOffers())[type];
+  const offers = generateOffersMap([...TRANSFERS, ...ACTIVITIES])[type];
   const city = getRandomArrayItem(CITIES);
-  const info = generateNewObject(city, generateInfo())[city];
+  const destination = generateDestination(city);
   const price = getRandomIntegerNumber(Price.MIN, Price.MAX);
   const isFavorite = getRandomBoolean();
-
+  const isNew = false;
 
   return {
-    id: nanoid(),
+    id,
     start,
     end,
-    city,
     type,
     offers,
-    day,
+    city,
+    destination,
     price,
     isFavorite,
-    info,
+    isNew,
   };
 };
 

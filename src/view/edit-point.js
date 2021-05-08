@@ -1,28 +1,31 @@
+import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
-import {CITIES, TRANSFERS, ACTIVITIES} from '../utils/const.js';
-import {getPreposition, generateNewArray, generateNewObject} from '../utils/common.js';
 import {formatValueDate} from '../utils/date.js';
-import {generateOffers, generateInfo} from '../mocks/point.js';
 
-const BLANK_POINT = {
-  start: new Date,
-  end: new Date,
-  city: '',
-  type: 'taxi',
-  offers: [],
-  day: new Date,
-  price: '',
-  isFavorite: false,
-  info: {},
+const BLANK_DESTINATION = {
+  name: '',
+  description: '',
+  photos: [],
 };
 
-const createCitiesMarkup = () => {
-  return CITIES.map((city) => {
-    return `<option value="${city}"></option>`;
-  })
-    .join('\n');
+const BLANK_POINT = {
+  isNew: false,
+  start: new Date(),
+  end: new Date(),
+  type: 'taxi',
+  offers: [],
+  price: parseInt(0),
+  isFavorite: false,
+  destination: BLANK_DESTINATION,
+};
+
+
+const createDestinationsMarkup = (destinations) => {
+  return destinations.map((destination) => {
+    return `<option value="${destination}"></option>`;
+  }).join('\n');
 };
 
 const createPhotosListMarkup = (photo) => {
@@ -48,7 +51,7 @@ const createPhotosMarkup = (photos) => {
 };
 
 const createDescriptionMarkup = (description) => {
-  if (!description) {
+  if (!description.length) {
     return '';
   }
 
@@ -57,8 +60,10 @@ const createDescriptionMarkup = (description) => {
   );
 };
 
-const generateInfoMarkup = ({ description, photos }) => {
-  if (!description && !photos.length) {
+const generateDestinationMarkup = (destination) => {
+  const {description, photos} = destination;
+
+  if (!description.length && !photos.length) {
     return '';
   }
   return (
@@ -86,11 +91,11 @@ const createTypesMarkup = (activeType, types) => {
 
 const createOfferListMarkup = (offers) => {
   return offers
-    .map(({ name, title, price, isChecked }, index) => {
+    .map(({name, title, price, isChecked}, index) => {
       return (
         `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${index}" type="checkbox" name="event-offer-${name}" ${isChecked ? 'checked' : ''}>
-        <label class="event__offer-label" for="event-offer-${title}" data-title="${title}">
+        <label class="event__offer-label" for="event-offer-${title.toLowerCase()}" data-title="${title}">
           <span class="event__offer-title">${title}</span>
           +
           €&nbsp;<span class="event__offer-price">${price}</span>
@@ -101,8 +106,8 @@ const createOfferListMarkup = (offers) => {
     .join('\n');
 };
 
-const createOffersMarkup = (isOffers, offers) => {
-  if (!isOffers) {
+const createOffersMarkup = (offers) => {
+  if (!offers.length) {
     return '';
   }
   const offersList = createOfferListMarkup(offers);
@@ -117,24 +122,27 @@ const createOffersMarkup = (isOffers, offers) => {
   );
 };
 
-const createRollUpButton = (point) => {
-  return (point.id !== 'new') ? (
+const createRollUpButton = (isPointNew) => {
+  if (isPointNew) {
+    return '';
+  }
+  return (
     `<button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>
-    </button>`) : '';
+     </button>`
+  );
 };
 
+const createEditPointTemplate = (data = {}, destinationsNames, offersTypes) => {
+  const {isNew, type, destination, price, offers, start, end} = data;
 
-const createEditPointTemplate = (data = {}) => {
-  const {type, city, info, price, offers, start, end, isOffers} = data;
-
-  const transfersList = createTypesMarkup(type, TRANSFERS);
-  const activitiesList = createTypesMarkup(type, ACTIVITIES);
-  const citiesMarkup = createCitiesMarkup();
-  const offersListContainer = createOffersMarkup(isOffers, offers);
-  const infoMarkup = generateInfoMarkup(info);
-  const preposition = getPreposition(TRANSFERS, type);
-  const rollUpButton = createRollUpButton(data);
+  const transfersList = createTypesMarkup(type, offersTypes.slice(0, 7));
+  const activitiesList = createTypesMarkup(type, offersTypes.slice(7, 10));
+  const destinationsList = createDestinationsMarkup(destinationsNames);
+  const destinationMarkup = generateDestinationMarkup(destination);
+  const offersListContainer = createOffersMarkup(offers);
+  const preposition = offersTypes.slice(0, 6).includes(type) ? 'to' : 'in';
+  const rollUpButton = createRollUpButton(isNew);
 
   return (
     `<li class="trip-events__item">
@@ -161,9 +169,9 @@ const createEditPointTemplate = (data = {}) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type} ${preposition}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${citiesMarkup}
+              ${destinationsList}
             </datalist>
           </div>
           <div class="event__field-group  event__field-group--time">
@@ -182,15 +190,17 @@ const createEditPointTemplate = (data = {}) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
-          </div>
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(price))}">
+        </div>
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          ${rollUpButton}
+          <button class="event__reset-btn" type=${isNew ? 'reset' : 'button'}>
+          ${isNew ? 'Cancel' : 'Delete'}
+          </button>
+         ${rollUpButton}
         </header>
         <section class="event__details">
           ${offersListContainer}
-          ${infoMarkup}
+          ${destinationMarkup}
         </section>
       </form>
     </li>`
@@ -198,44 +208,50 @@ const createEditPointTemplate = (data = {}) => {
 };
 
 export default class EditPoint extends SmartView {
-  constructor(data = BLANK_POINT) {
+  constructor(data = BLANK_POINT, destinationsNames, offersTypes) {
     super();
     this._data = data;
-    this._stateData = EditPoint.parseDataToState(data);
-    this._offers = this._stateData.offers.slice();
+    this._stateData = EditPoint.parseDataToState(this._data);
+    this._destinationsNames = destinationsNames;
+    this._offersTypes = offersTypes;
     this._startDatepicker = null;
     this._endDatepicker = null;
+    this._currentUserDate = null;
 
     this._buttonCloseClickHandler = this._buttonCloseClickHandler.bind(this);
-    this._submitHandler = this._submitHandler.bind(this);
-    this._typeChangeHandler = this._typeChangeHandler.bind(this);
-    this._cityChangeHandler = this._cityChangeHandler.bind(this);
-    this._priceInputHandler = this._priceInputHandler.bind(this);
-    this._offersChangeHandler = this._offersChangeHandler.bind(this);
+    this._buttonDeleteClickHandler = this._buttonDeleteClickHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._typeChangeHandler = this._typeChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
+    this._offersChangeHandler = this._offersChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setStartDatepicker();
     this._setEndDatepicker();
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this._stateData);
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatepicker || this._endDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
   }
 
-  _setInnerHandlers() {
-    if (this._stateData.isOffers) {
-      this.getElement().querySelector('.event__available-offers').addEventListener('click', this._offersChangeHandler);
-    }
-    this.getElement().querySelector('.event__type-list').addEventListener('change', this._typeChangeHandler);
-    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._cityChangeHandler);
-    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
+  getTemplate() {
+    return createEditPointTemplate(this._stateData, this._destinationsNames, this._offersTypes);
   }
 
   _setStartDatepicker() {
     if (this._startDatepicker) {
-      this._destroyStartDatepicker();
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
     }
 
     this._startDatepicker = flatpickr(
@@ -255,7 +271,8 @@ export default class EditPoint extends SmartView {
 
   _setEndDatepicker() {
     if (this._endDatepicker) {
-      this._destroyEndDatepicker();
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
     }
 
     this._endDatepicker = flatpickr(
@@ -275,65 +292,80 @@ export default class EditPoint extends SmartView {
   }
 
   _startDateChangeHandler([userDate]) {
-    this.updateState({
-      start: userDate,
-    }, true);
-
+    this._currentUserDate = userDate;
     this._endDatepicker.set('minDate', userDate);
     this._endDatepicker.set('minTime', userDate);
 
-    if (this._stateData.start <= userDate) {
+    if (this._currentUserDate <= userDate && this._stateData.end <= userDate) {
       this._endDatepicker.setDate(userDate);
-      this._stateData.start = userDate;
-
-      this.updateState({
-        start: userDate,
-      }, true);
+      this._startDatepicker.setDate(userDate);
+      this._currentUserDate = userDate;
     }
+
+    this.updateState({
+      start: userDate,
+    }, true);
   }
 
   _endDateChangeHandler([userDate]) {
+    this._startDatepicker.set('maxDate', userDate);
+
     this.updateState({
       end: userDate,
     }, true);
   }
 
-  _offersChangeHandler(evt) {
-    event.preventDefault();
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+    const currentDestination = evt.target.value;
+    const isDestinationInList = this._destinationsNames.includes(currentDestination);
+    const destination = this._callback.destinationChange(currentDestination);
 
-    if (evt.target.closest('.event__offer-label')) {
-      const title = evt.target.closest('.event__offer-label').dataset.title;
-      const index = this._stateData.offers.findIndex((offer) => offer.title === title);
-      this._offers[index].isChecked = !this._offers[index].isChecked;
-
+    if (destination && isDestinationInList) {
+      evt.target.setCustomValidity('');
       this.updateState({
-        offers: this._offers,
+        destination,
       }, false);
+    } else {
+      evt.target.setCustomValidity('Please select the city from the list');
+      return;
     }
   }
 
   _typeChangeHandler(evt) {
     evt.preventDefault();
-    this.updateState({
-      type: evt.target.value,
-      offers: generateNewArray([...TRANSFERS, ...ACTIVITIES], generateOffers())[evt.target.value],
-    }, false);
+    const type = evt.target.textContent;
+    const offers = this._callback.typeChange(type);
+
+    if (offers) {
+      this.updateState({
+        type: evt.target.textContent,
+        offers: this._callback.typeChange(type),
+      }, true);
+    }
   }
 
-  _cityChangeHandler(evt) {
+  _offersChangeHandler(evt) {
     evt.preventDefault();
+    const title = evt.target.closest('label').dataset.title;
+    const index = this._stateData.offers.findIndex((offer) => offer.title === title);
+    const offers = this._stateData.offers.slice();
+
     this.updateState({
-      city: evt.target.value,
-      info: generateNewObject(evt.target.value, generateInfo())[evt.target.value],
+      offers: Object.assign(
+        [],
+        offers,
+        offers[index].isChecked = !offers[index].isChecked,
+      ),
     }, false);
   }
 
   _priceInputHandler(evt) {
     evt.preventDefault();
-    if (!Number.isNaN(parseInt(evt.target.value)) && parseInt(evt.target.value) > 0) {
+    if (!Number.isNaN(parseInt(evt.target.value, 10)) && (parseInt(evt.target.value, 10) > 0)) {
       evt.target.setCustomValidity('');
       this.updateState({
-        price: evt.target.value,
+        price: parseInt(evt.target.value, 10),
       }, true);
     } else {
       evt.target.setCustomValidity('Please input some positive number');
@@ -342,37 +374,60 @@ export default class EditPoint extends SmartView {
   }
 
   _buttonCloseClickHandler() {
-    this._callback.click();
+    this._callback.closeClick();
   }
 
-  _submitHandler(evt) {
+  _buttonDeleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(EditPoint.parseStateToDate(this._stateData));
+    this._callback.deleteClick(EditPoint.parseStateToDate(this._stateData));
   }
 
-  _destroyStartDatepicker() {
-    this._startDatepicker.destroy();
-    this._startDatepicker = null;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit(EditPoint.parseStateToDate(this._stateData));
   }
 
-  _destroyEndDatepicker() {
-    this._endDatepicker.destroy();
-    this._endDatepicker = null;
+  _setInnerHandlers() {
+    if (this._stateData.offers.length) {
+      this.getElement().querySelectorAll('.event__offer-selector').forEach((offer) =>
+        offer.addEventListener('click', this._offersChangeHandler));
+    }
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
   }
 
   setButtonCloseClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonCloseClickHandler);
+    this._callback.closeClick = callback;
+    if (!this._stateData.isNew) {
+      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonCloseClickHandler);
+    }
   }
 
-  setSubmitHandler(callback) {
-    this._callback.submit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._submitHandler);
+  setButtonDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._buttonDeleteClickHandler);
+  }
+
+  setDestinationChangeHandler(callback) {
+    this._callback.destinationChange = callback;
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
+  }
+
+  setTypeChangeHandler(callback) {
+    this._callback.typeChange = callback;
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 
   restoreHandlers() {
-    this.setButtonCloseClickHandler(this._callback.click);
-    this.setSubmitHandler(this._callback.submit);
+    this.setButtonCloseClickHandler(this._callback.closeClick);
+    this.setButtonDeleteClickHandler(this._callback.deleteClick);
+    this.setDestinationChangeHandler(this._callback.destinationChange);
+    this.setTypeChangeHandler(this._callback.typeChange);
+    this.setFormSubmitHandler(this._callback.formSubmit);
     this._setInnerHandlers();
     this._setStartDatepicker();
     this._setEndDatepicker();
@@ -389,19 +444,21 @@ export default class EditPoint extends SmartView {
       {},
       point,
       {
-        isOffers: point.offers.length,
-        info: point.info = {
-          description: point.info.description,
-          photos: point.info.photos,
+        offers: point.offers.map((obj) => ({ ...obj})),
+        destination: {
+          name: point.destination.name,
+          description: point.destination.description,
+          photos: point.destination.photos,
         },
       },
     );
   }
 
+
   static parseStateToDate(data) {
     data = Object.assign({}, data);
 
-    delete data.isOffers;
+    data.isNew = false;
 
     return data;
   }

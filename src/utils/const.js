@@ -1,3 +1,29 @@
+export const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
+export const SortType = {
+  DEFAULT: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers',
+};
+
 export const TRANSFERS = [
   'taxi',
   'bus',
@@ -19,6 +45,12 @@ export const CITIES = [
   'Geneva',
   'Chamonix',
   'Saint Petersburg',
+  'Moscow',
+  'Madrid',
+  'Milan',
+  'Athens',
+  'Vienna',
+  'Paris',
 ];
 
 export const DESCRIPTIONS = [
@@ -43,16 +75,6 @@ export const OFFERS = [
   {name: 'seats', title: 'Choose seats'},
   {name: 'tickets', title: 'Book tickets'},
 ];
-
-export const FILTERS = ['everything', 'future', 'past'];
-
-export const SortType = {
-  DEFAULT: 'day',
-  EVENT: 'event',
-  TIME: 'time',
-  PRICE: 'price',
-  OFFERS: 'offers',
-};
 
 export const Description = {
   MIN: 0,
