@@ -41,6 +41,19 @@ export const formatDiffDate = (start, end) => {
 
 };
 
+export const formatDuration = (duration) => {
+  const daysDuration = dayjs.duration(duration);
+  const hoursDuration = dayjs.duration(duration);
+  const minutesDuration = dayjs.duration(duration);
+
+  const days = daysDuration.days() === 0 ? '' : daysDuration.days() + 'D ';
+  const hours = hoursDuration.hours() === 0 ? '' : hoursDuration.hours() + 'H ';
+  const minutes = minutesDuration.minutes() === 0 ? '' : minutesDuration.minutes() + 'M';
+
+  return `${days} ${hours} ${minutes}`;
+
+};
+
 export const areDatesEqual = (dateA, dateB) => {
   return (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');
 };

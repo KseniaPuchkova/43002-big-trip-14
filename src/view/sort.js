@@ -14,7 +14,7 @@ const createSortTypeMarkup = (currentSortType, sortType) => {
 };
 
 const createSortTemplate = (currentSortType) => {
-  const sortTypesList = Object.values(SortType).map((sortType) => createSortTypeMarkup(currentSortType, sortType)).join('\n');
+  const sortTypesList = Object.values(SortType).map((sortType) => createSortTypeMarkup(currentSortType, sortType)).join('');
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
         ${sortTypesList}
