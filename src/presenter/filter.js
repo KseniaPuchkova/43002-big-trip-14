@@ -18,8 +18,8 @@ export default class Filter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
-    const filters = this._getFilters();
+  init(isDisabled) {
+    const filters = this._getFilters(isDisabled);
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._filterModel.getFilter());
@@ -46,8 +46,8 @@ export default class Filter {
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
-  _getFilters() {
-    const points = this._pointsModel.getPoints();
+  _getFilters(isDisabled) {
+    const points = !isDisabled ? this._pointsModel.getPoints() : [];
 
     return [
       {

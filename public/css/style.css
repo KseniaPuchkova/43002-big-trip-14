@@ -96,6 +96,9 @@ main {
     width: 2px;
     background-color: rgba(255, 255, 255, 0.58); }
 
+    .page-body__container--line-hidden::after {
+      width: 0;}
+
 .page-body__page-main {
   -ms-flex-positive: 1;
       flex-grow: 1;

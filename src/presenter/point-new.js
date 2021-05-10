@@ -1,26 +1,6 @@
-import {nanoid} from 'nanoid';
 import EditPointView  from '../view/edit-point.js';
-import {addDays} from '../utils/date.js';
-import {UserAction, UpdateType} from '../utils/const.js';
+import {BLANK_POINT, UserAction, UpdateType} from '../utils/const.js';
 import {RenderPosition, render, remove} from '../utils/render.js';
-
-const BLANK_DESTINATION = {
-  name: '',
-  description: '',
-  photos: [],
-};
-
-export const BLANK_POINT = {
-  id: nanoid(),
-  isNew: true,
-  start: new Date(),
-  end: addDays(new Date()),
-  type: 'taxi',
-  offers: [],
-  price: parseInt(0, 10),
-  isFavorite: false,
-  destination: BLANK_DESTINATION,
-};
 
 export default class PointNew {
   constructor(pointContainer, tripPointButtonAddElement, noPointsComponent, changeData, destinationsModel, offersModel) {
@@ -41,10 +21,6 @@ export default class PointNew {
   }
 
   init() {
-    if (this._editPointComponent !== null) {
-      return;
-    }
-
     this._renderPointNew();
   }
 
@@ -62,6 +38,10 @@ export default class PointNew {
   }
 
   _renderPointNew() {
+    if (this._editPointComponent !== null) {
+      return;
+    }
+
     if (this._noPointsComponent !== null) {
       remove(this._noPointsComponent);
       this._noPointsComponent = null;
@@ -70,8 +50,6 @@ export default class PointNew {
     this._point = BLANK_POINT;
     this._destinationsNames = this._destinationsModel.getDestinationsNames();
     this._offersTypes = this._offersModel.getOffersTypes();
-    this._currentType = this._point.type;
-    this._currentDestinationName = this._point.destination.name;
 
     this._editPointComponent = new EditPointView(this._point, this._destinationsNames, this._offersTypes);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
@@ -87,13 +65,7 @@ export default class PointNew {
   }
 
   _handleDestinationChange(name) {
-    if (this._currentDestinationName === name) {
-      return;
-    }
-
-    this._currentDestinationName = name;
     const destination = this._destinationsModel.getDestinationByName(name);
-
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
@@ -104,12 +76,6 @@ export default class PointNew {
   }
 
   _handleTypeChange(type) {
-    if (this._currentType === type) {
-      return;
-    }
-
-    this._currentType = type;
-
     const offers = this._offersModel.getOffersByType(type);
     this._changeData(
       UserAction.ADD_POINT,
@@ -127,7 +93,6 @@ export default class PointNew {
       UpdateType.MAJOR,
       Object.assign({},point),
     );
-
     this.destroy();
   }
 

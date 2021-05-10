@@ -35,8 +35,6 @@ export default class Point {
     this._point = point;
     this._destinationsNames = this._destinationsModel.getDestinationsNames();
     this._offersTypes = this._offersModel.getOffersTypes();
-    this._currentType = this._point.type;
-    this._currentDestinationName = this._point.destination.name;
 
     const prevPointComponent = this._pointComponent;
     const prevEditPointComponent = this._editPointComponent;
@@ -114,11 +112,6 @@ export default class Point {
   }
 
   _handleDestinationChange(name) {
-    if (this._currentDestinationName === name) {
-      return;
-    }
-
-    this._currentDestinationName = name;
     const destination = this._destinationsModel.getDestinationByName(name);
     this._changeData(
       UserAction.UPDATE_POINT,
@@ -130,11 +123,6 @@ export default class Point {
   }
 
   _handleTypeChange(type) {
-    if (this._currentType === type) {
-      return;
-    }
-
-    this._currentType === type;
     const offers = this._offersModel.getOffersByType(type);
     this._changeData(
       UserAction.UPDATE_POINT,

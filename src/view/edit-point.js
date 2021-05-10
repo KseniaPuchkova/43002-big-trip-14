@@ -2,25 +2,8 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
+import {BLANK_POINT} from '../utils/const.js';
 import {formatValueDate} from '../utils/date.js';
-
-const BLANK_DESTINATION = {
-  name: '',
-  description: '',
-  photos: [],
-};
-
-const BLANK_POINT = {
-  isNew: false,
-  start: new Date(),
-  end: new Date(),
-  type: 'taxi',
-  offers: [],
-  price: parseInt(0),
-  isFavorite: false,
-  destination: BLANK_DESTINATION,
-};
-
 
 const createDestinationsMarkup = (destinations) => {
   return destinations.map((destination) => {
@@ -319,16 +302,16 @@ export default class EditPoint extends SmartView {
     evt.preventDefault();
     const currentDestination = evt.target.value;
     const isDestinationInList = this._destinationsNames.includes(currentDestination);
-    const destination = this._callback.destinationChange(currentDestination);
 
-    if (destination && isDestinationInList) {
+    if (!isDestinationInList) {
+      evt.target.setCustomValidity('Please select the city from the list');
+      return;
+    } else {
+      const destination = this._callback.destinationChange(currentDestination);
       evt.target.setCustomValidity('');
       this.updateState({
         destination,
-      }, false);
-    } else {
-      evt.target.setCustomValidity('Please select the city from the list');
-      return;
+      }, true);
     }
   }
 
@@ -339,8 +322,8 @@ export default class EditPoint extends SmartView {
 
     if (offers) {
       this.updateState({
-        type: evt.target.textContent,
-        offers: this._callback.typeChange(type),
+        type,
+        offers,
       }, true);
     }
   }
@@ -362,14 +345,14 @@ export default class EditPoint extends SmartView {
 
   _priceInputHandler(evt) {
     evt.preventDefault();
-    if (!Number.isNaN(parseInt(evt.target.value, 10)) && (parseInt(evt.target.value, 10) > 0)) {
+    if (Number.isNaN(parseInt(evt.target.value, 10)) || (parseInt(evt.target.value, 10) <= 0)) {
+      evt.target.setCustomValidity('Please input some positive number');
+      return;
+    } else {
       evt.target.setCustomValidity('');
       this.updateState({
         price: parseInt(evt.target.value, 10),
       }, true);
-    } else {
-      evt.target.setCustomValidity('Please input some positive number');
-      return;
     }
   }
 

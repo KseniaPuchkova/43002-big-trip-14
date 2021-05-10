@@ -14,8 +14,8 @@ export default class Destinations extends Observer {
     return this._destinations;
   }
 
-  getDestinationByName(nameToGetBy) {
-    return this._destinations[nameToGetBy];
+  getDestinationByName(name) {
+    return this._destinations[name];
   }
 
   getDestinationsNames() {
