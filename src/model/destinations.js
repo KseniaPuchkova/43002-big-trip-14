@@ -6,21 +6,31 @@ export default class Destinations extends Observer {
     this._destinations = [];
   }
 
-  setDestinations(destinations) {
+  setDestinations(updateType, destinations) {
     this._destinations = destinations;
+    this._notify(updateType);
   }
 
   getDestinations() {
     return this._destinations;
   }
 
-  getDestinationByName(name) {
-    return this._destinations[name];
+  getDestinationsMap() {
+    return this._destinations.reduce((acc, destination) => (acc[destination.name] = destination, acc), {});
   }
 
-  getDestinationsNames() {
-    if (this._destinations) {
-      return Object.keys(this._destinations);
-    }
+
+  static adaptToClient(destination) {
+    const adaptedDestination = Object.assign(
+      {},
+      destination,
+      {
+        photos: destination.pictures,
+      },
+    );
+
+    delete adaptedDestination.pictures;
+
+    return adaptedDestination;
   }
 }

@@ -14,8 +14,6 @@ export default class PointNew {
     this._editPointComponent = null;
 
     this._handleButtonDeleteClick = this._handleButtonDeleteClick.bind(this);
-    this._handleTypeChange = this._handleTypeChange.bind(this);
-    this._handleDestinationChange = this._handleDestinationChange.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
@@ -48,13 +46,12 @@ export default class PointNew {
     }
 
     this._point = BLANK_POINT;
-    this._destinationsNames = this._destinationsModel.getDestinationsNames();
-    this._offersTypes = this._offersModel.getOffersTypes();
+    BLANK_POINT.offers = this._offersModel.getOffersByType(BLANK_POINT.type);
+    this._destinations = this._destinationsModel.getDestinations();
+    this._offers = this._offersModel.getOffers();
 
-    this._editPointComponent = new EditPointView(this._point, this._destinationsNames, this._offersTypes);
+    this._editPointComponent = new EditPointView(this._point, this._destinations, this._offers);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
-    this._editPointComponent.setDestinationChangeHandler(this._handleDestinationChange);
-    this._editPointComponent.setTypeChangeHandler(this._handleTypeChange);
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     render(this._pointContainer, this._editPointComponent, RenderPosition.AFTERBEGIN);
@@ -62,29 +59,6 @@ export default class PointNew {
     this._tripPointButtonAddElement.disabled = true;
 
     document.addEventListener('keydown', this._escKeyDownHandler);
-  }
-
-  _handleDestinationChange(name) {
-    const destination = this._destinationsModel.getDestinationByName(name);
-    this._changeData(
-      UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      Object.assign({}, this._point,{
-        destination,
-      }),
-    );
-  }
-
-  _handleTypeChange(type) {
-    const offers = this._offersModel.getOffersByType(type);
-    this._changeData(
-      UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      Object.assign({}, this._point,{
-        type,
-        offers,
-      }),
-    );
   }
 
   _handleFormSubmit(point) {

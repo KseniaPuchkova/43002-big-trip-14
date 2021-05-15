@@ -142,9 +142,10 @@ export const generatePoint = () => {
   const start = randomDate.startDate;
   const end = randomDate.endDate;
   const type = getRandomArrayItem([...TRANSFERS, ...ACTIVITIES]);
-  const offers = generateOffersMap([...TRANSFERS, ...ACTIVITIES])[type];
+  const offersByType = generateOffersMap([...TRANSFERS, ...ACTIVITIES])[type];
   const city = getRandomArrayItem(CITIES);
   const destination = generateDestination(city);
+  //const destination = {};
   const price = getRandomIntegerNumber(Price.MIN, Price.MAX);
   const isFavorite = getRandomBoolean();
   const isNew = false;
@@ -154,7 +155,7 @@ export const generatePoint = () => {
     start,
     end,
     type,
-    offers,
+    offersByType,
     city,
     destination,
     price,

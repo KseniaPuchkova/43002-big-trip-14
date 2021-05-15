@@ -2,7 +2,7 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
-import {BLANK_POINT} from '../utils/const.js';
+import {BLANK_POINT, TRANSFERS, ACTIVITIES} from '../utils/const.js';
 import {formatValueDate} from '../utils/date.js';
 
 const createDestinationsMarkup = (destinations) => {
@@ -12,8 +12,9 @@ const createDestinationsMarkup = (destinations) => {
 };
 
 const createPhotosListMarkup = (photo) => {
+  const {src, description} = photo;
   return (
-    `<img class="event__photo" src="${photo}" alt="Event photo">`
+    `<img class="event__photo" src="${src}" alt="${description}">`
   );
 };
 
@@ -74,10 +75,10 @@ const createTypesMarkup = (activeType, types) => {
 
 const createOfferListMarkup = (offers) => {
   return offers
-    .map(({name, title, price, isChecked}, index) => {
+    .map(({title, price, isChecked}, index) => {
       return (
         `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-${index}" type="checkbox" name="event-offer-${name}" ${isChecked ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-name-${index}" type="checkbox" name="event-offer-name" ${isChecked ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${title.toLowerCase()}" data-title="${title}">
           <span class="event__offer-title">${title}</span>
           +
@@ -116,15 +117,17 @@ const createRollUpButton = (isPointNew) => {
   );
 };
 
-const createEditPointTemplate = (data = {}, destinationsNames, offersTypes) => {
-  const {isNew, type, destination, price, offers, start, end} = data;
+const createEditPointTemplate = (data = {}, destinations, offersTypes) => {
+  const {start, end, destination, type, offers, price, isNew} = data;
 
-  const transfersList = createTypesMarkup(type, offersTypes.slice(0, 7));
-  const activitiesList = createTypesMarkup(type, offersTypes.slice(7, 10));
-  const destinationsList = createDestinationsMarkup(destinationsNames);
+  const destinationNames = destinations.map((destination) => destination.name);
+  const destinationsList = createDestinationsMarkup(destinationNames);
   const destinationMarkup = generateDestinationMarkup(destination);
   const offersListContainer = createOffersMarkup(offers);
-  const preposition = offersTypes.slice(0, 6).includes(type) ? 'to' : 'in';
+  //const types = offersTypes.map((offer) => offer.type);
+  const transfersList = createTypesMarkup(type, TRANSFERS);
+  const activitiesList = createTypesMarkup(type, ACTIVITIES);
+  const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
   const rollUpButton = createRollUpButton(isNew);
 
   return (
@@ -191,12 +194,12 @@ const createEditPointTemplate = (data = {}, destinationsNames, offersTypes) => {
 };
 
 export default class EditPoint extends SmartView {
-  constructor(data = BLANK_POINT, destinationsNames, offersTypes) {
+  constructor(data = BLANK_POINT, destinations, offers) {
     super();
     this._data = data;
     this._stateData = EditPoint.parseDataToState(this._data);
-    this._destinationsNames = destinationsNames;
-    this._offersTypes = offersTypes;
+    this._destinations = destinations;
+    this._offers = offers;
     this._startDatepicker = null;
     this._endDatepicker = null;
     this._currentUserDate = null;
@@ -228,7 +231,7 @@ export default class EditPoint extends SmartView {
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._stateData, this._destinationsNames, this._offersTypes);
+    return createEditPointTemplate(this._stateData, this._destinations, this._offers);
   }
 
   _setStartDatepicker() {
@@ -301,30 +304,28 @@ export default class EditPoint extends SmartView {
   _destinationChangeHandler(evt) {
     evt.preventDefault();
     const currentDestination = evt.target.value;
-    const isDestinationInList = this._destinationsNames.includes(currentDestination);
-
-    if (!isDestinationInList) {
+    const destination = this._destinations.find((destination) => destination.name === currentDestination);
+    if (!destination || !currentDestination) {
       evt.target.setCustomValidity('Please select the city from the list');
       return;
     } else {
-      const destination = this._callback.destinationChange(currentDestination);
       evt.target.setCustomValidity('');
       this.updateState({
         destination,
-      }, true);
+      }, false);
     }
   }
 
   _typeChangeHandler(evt) {
     evt.preventDefault();
     const type = evt.target.textContent;
-    const offers = this._callback.typeChange(type);
+    const offers = this._offers.find((offer) => offer.type === type).offers;
 
     if (offers) {
       this.updateState({
         type,
         offers,
-      }, true);
+      }, false);
     }
   }
 
@@ -376,6 +377,8 @@ export default class EditPoint extends SmartView {
         offer.addEventListener('click', this._offersChangeHandler));
     }
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);
   }
 
   setButtonCloseClickHandler(callback) {
@@ -390,16 +393,6 @@ export default class EditPoint extends SmartView {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._buttonDeleteClickHandler);
   }
 
-  setDestinationChangeHandler(callback) {
-    this._callback.destinationChange = callback;
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
-  }
-
-  setTypeChangeHandler(callback) {
-    this._callback.typeChange = callback;
-    this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);
-  }
-
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
@@ -408,8 +401,6 @@ export default class EditPoint extends SmartView {
   restoreHandlers() {
     this.setButtonCloseClickHandler(this._callback.closeClick);
     this.setButtonDeleteClickHandler(this._callback.deleteClick);
-    this.setDestinationChangeHandler(this._callback.destinationChange);
-    this.setTypeChangeHandler(this._callback.typeChange);
     this.setFormSubmitHandler(this._callback.formSubmit);
     this._setInnerHandlers();
     this._setStartDatepicker();

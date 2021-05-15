@@ -66,3 +66,15 @@ export const remove = (component) => {
   component.getElement().remove();
   component.removeElement();
 };
+
+export const showContainerlineElement = () => {
+  document.querySelectorAll('.page-body__container').forEach((container) => {
+    container.classList.remove('page-body__container--line-hidden');
+  });
+};
+
+export const hideContainerlineElement = () => {
+  document.querySelectorAll('.page-body__container').forEach((container) => {
+    container.classList.add('page-body__container--line-hidden');
+  });
+};

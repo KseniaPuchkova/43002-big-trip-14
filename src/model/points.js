@@ -6,8 +6,9 @@ export default class Points extends Observer {
     this._points = [];
   }
 
-  setPoints(points) {
+  setPoints(updateType, points) {
     this._points = points.slice();
+    this._notify(updateType);
   }
 
   getPoints() {
@@ -52,5 +53,87 @@ export default class Points extends Observer {
     ];
 
     this._notify(updateType);
+  }
+
+  static adaptToClient(point) {
+    const adaptedOffers = [];
+
+    for (let i = 0; i < point.offers.length; i++) {
+      adaptedOffers.push(Object.assign(
+        {},
+        point.offers[i],
+        {
+          isChecked: point.offers[i].isChecked,
+        },
+      ));
+    }
+
+    const adaptedPoint = Object.assign({},
+      point,
+      {
+        start: new Date(point.date_from),
+        end: new Date(point.date_to),
+        price: point.base_price,
+        isFavorite: point.is_favorite,
+        destination: Object.assign(
+          {},
+          point.destination,
+          {
+            photos: point.destination.pictures,
+          },
+        ),
+        offers: adaptedOffers,
+      });
+
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.base_price;
+    delete adaptedPoint.is_favorite;
+    delete adaptedPoint.destination.pictures;
+    delete adaptedPoint.offers.isChecked;
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point) {
+    const adaptedOffers = [];
+
+    for (let i = 0; i < point.offers.length; i++) {
+      adaptedOffers.push(Object.assign(
+        {},
+        point.offers[i],
+        {
+          isChecked: point.offers[i].isChecked,
+        },
+      ));
+    }
+
+    const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        'date_from': point.start.toISOString(),
+        'date_to': point.end.toISOString(),
+        'base_price': point.price,
+        'is_favorite': point.isFavorite,
+        destination: Object.assign(
+          {},
+          point.destination,
+          {
+            pictures: point.destination.photos,
+          },
+        ),
+        offers: adaptedOffers,
+      },
+    );
+
+    delete adaptedPoint.start;
+    delete adaptedPoint.end;
+    delete adaptedPoint.price;
+    delete adaptedPoint.photos;
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.offers.isChecked;
+
+    return adaptedPoint;
   }
 }

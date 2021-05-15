@@ -47,11 +47,3 @@ export const getSortedItems = (items, sortType) => {
 
   return sortedItems;
 };
-
-export const showContainerline = () => document.querySelectorAll('.page-body__container').forEach((container) => {
-  container.classList.remove('page-body__container--line-hidden');
-});
-
-export const hideContainerline = () => document.querySelectorAll('.page-body__container').forEach((container) => {
-  container.classList.add('page-body__container--line-hidden');
-});
