@@ -25,29 +25,25 @@ export default class Point {
     this._handleButtonCloseClick = this._handleButtonCloseClick.bind(this);
     this._handleButtonDeleteClick = this._handleButtonDeleteClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-    this._handleDestinationChange = this._handleDestinationChange.bind(this);
-    this._handleTypeChange = this._handleTypeChange.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   init(point) {
     this._point = point;
-    this._destinationsNames = this._destinationsModel.getDestinationsNames();
-    this._offersTypes = this._offersModel.getOffersTypes();
+    this._destinations = this._destinationsModel.getDestinations();
+    this._offers = this._offersModel.getOffers();
 
     const prevPointComponent = this._pointComponent;
     const prevEditPointComponent = this._editPointComponent;
 
-    this._pointComponent = new PointView(point, this._offersTypes);
-    this._editPointComponent = new EditPointView(point, this._destinationsNames, this._offersTypes);
+    this._pointComponent = new PointView(point);
+    this._editPointComponent = new EditPointView(point, this._destinations, this._offers);
 
     this._pointComponent.setButtonOpenClickHandler(this._handleButtonOpenClick);
     this._editPointComponent.setButtonCloseClickHandler(this._handleButtonCloseClick);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._editPointComponent.setDestinationChangeHandler(this._handleDestinationChange);
-    this._editPointComponent.setTypeChangeHandler(this._handleTypeChange);
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
@@ -107,29 +103,6 @@ export default class Point {
       UpdateType.MINOR,
       Object.assign({}, this._point,{
         isFavorite: !this._point.isFavorite,
-      }),
-    );
-  }
-
-  _handleDestinationChange(name) {
-    const destination = this._destinationsModel.getDestinationByName(name);
-    this._changeData(
-      UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
-      Object.assign({}, this._point,{
-        destination,
-      }),
-    );
-  }
-
-  _handleTypeChange(type) {
-    const offers = this._offersModel.getOffersByType(type);
-    this._changeData(
-      UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
-      Object.assign({}, this._point,{
-        type,
-        offers,
       }),
     );
   }

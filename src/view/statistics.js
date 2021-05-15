@@ -2,15 +2,15 @@ import SmartView from './smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {formatDuration} from '../utils/date.js';
-import {BAR_HEIGHT, getTypesUnique, getSpentMoney, getSpentTime, getCountTypes} from '../utils/statistics.js';
+import {BAR_HEIGHT, getTypesUnique, getMoneySpend, getTypesCount, getTimeSpend} from '../utils/statistics.js';
 import {ChartName} from '../utils/const.js';
 
-const renderChart = (nameOfCtx, titles, data, typesUnique, dataFormat) => {
-  return new Chart(nameOfCtx, {
+const renderChart = (nameCtx, titles, data, types, dataFormat) => {
+  return new Chart(nameCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: typesUnique,
+      labels: types,
       datasets: [{
         data: data,
         backgroundColor: '#ffffff',
@@ -95,10 +95,14 @@ export default class Statistics extends SmartView {
   constructor(points) {
     super();
     this._points = points;
-    this._typesUnique = null;
+    this._typesUnique = getTypesUnique(this._points).slice();
+    this._moneySpend = getMoneySpend(this._points, this._typesUnique);
+    this._typesCount = getTypesCount(this._points, this._typesUnique);
+    this._timeSpend = getTimeSpend(this._points, this._typesUnique);
+
+    this._moneySpendChart = null;
+    this._typeCountChart = null;
     this._timeSpendChart = null;
-    this._moneyChart = null;
-    this._transportChart = null;
 
     this.renderCharts();
   }
@@ -108,25 +112,27 @@ export default class Statistics extends SmartView {
   }
 
   renderCharts() {
-    const moneyCtx = this.getElement().querySelector('.statistics__chart--money');
-    const typeCtx = this.getElement().querySelector('.statistics__chart--transport');
-    const timeSpendCtx = this.getElement().querySelector('.statistics__chart--time-spend');
+    this._resetCharts();
 
-    this._typesUnique = getTypesUnique(this._points);
+    const moneyCtx = this.getElement().querySelector('.statistics__chart--money');
+    const typeCtx = this.getElement().querySelector('.statistics__chart--type');
+    const timeSpendCtx = this.getElement().querySelector('.statistics__chart--time-spend');
 
     moneyCtx.height = BAR_HEIGHT * this._typesUnique.length;
     typeCtx.height = BAR_HEIGHT * this._typesUnique.length;
     timeSpendCtx.height = BAR_HEIGHT * this._typesUnique.length;
 
-    const spentMoney = getSpentMoney(this._points, this._typesUnique);
-    const spentTime = getSpentTime(this._points, this._typesUnique);
-    const countTypes = getCountTypes(this._points, this._typesUnique);
+    const moneySpendSorted = this._moneySpend.map((moneySpend) => moneySpend.moneySpend);
+    const typesByMoneySpend = this._moneySpend.map((moneySpend) => moneySpend.type);
+    this._moneySpendChart = renderChart(moneyCtx, ChartName.MONEY.toUpperCase(), moneySpendSorted, typesByMoneySpend, ((val) => `€ ${val}`));
 
-    this._resetCharts();
+    const typesCountSorted = this._typesCount.map((typesCount) => typesCount.typesCount);
+    const typesByTypesCount = this._typesCount.map((typesCount) => typesCount.type);
+    this._typeCountChart = renderChart(typeCtx, ChartName.TYPE.toUpperCase(), typesCountSorted, typesByTypesCount, ((val) => `${val}x`));
 
-    this._moneyChart = renderChart(moneyCtx, 'MONEY', spentMoney, this._typesUnique, ((val) => `€ ${val}`));
-    this._typeChart = renderChart(typeCtx, 'TYPE', countTypes, this._typesUnique, ((val) => `${val}x`));
-    this._timeSpendChart = renderChart(timeSpendCtx, 'TIME-SPEND', spentTime, this._typesUnique, ((val) => `${formatDuration(val)}`));
+    const timeSpendSorted = this._timeSpend.map((timeSpend) => timeSpend.timeSpend);
+    const typesByTimeSpend = this._timeSpend.map((timeSpend) => timeSpend.type);
+    this._timeSpendChart = renderChart(timeSpendCtx, ChartName.TIMESPEND.toUpperCase(), timeSpendSorted, typesByTimeSpend, ((val) => `${formatDuration(val)}`));
   }
 
   removeElement() {

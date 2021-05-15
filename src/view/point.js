@@ -1,5 +1,6 @@
 import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
+import {TRANSFERS, ACTIVITIES} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
@@ -17,9 +18,10 @@ const generateOffersMarkup = (offers) => {
   return '';
 };
 
-const createPointTemplate = ({type, start, end, destination, price, offers, isFavorite} = {}, offersTypes) => {
+const createPointTemplate = ({start, end, destination, price, type, offers, isFavorite} = {}) => {
+
   const offersList = generateOffersMarkup(offers);
-  const preposition = offersTypes.slice(0, 7).includes(type) ? 'to' : 'in';
+  const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
 
   return (
     `<li class="trip-events__item">
@@ -59,10 +61,9 @@ const createPointTemplate = ({type, start, end, destination, price, offers, isFa
 };
 
 export default class Point extends AbstractView {
-  constructor(data, offersTypes) {
+  constructor(data) {
     super();
     this._data = data;
-    this._offersTypes = offersTypes;
     this._buttonOpenClickHandler = this._buttonOpenClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
@@ -77,7 +78,7 @@ export default class Point extends AbstractView {
   }
 
   getTemplate() {
-    return createPointTemplate(this._data, this._offersTypes);
+    return createPointTemplate(this._data);
   }
 
   setButtonOpenClickHandler(callback) {

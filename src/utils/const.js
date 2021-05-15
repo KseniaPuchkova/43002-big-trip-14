@@ -2,7 +2,7 @@ import {nanoid} from 'nanoid';
 import {addDays} from '../utils/date.js';
 
 const BLANK_DESTINATION = {
-  name: 'Moscow',
+  name: '',
   description: '',
   photos: [],
 };
@@ -11,10 +11,10 @@ export const BLANK_POINT = {
   id: nanoid(),
   isNew: true,
   start: new Date(),
-  end: addDays(new Date()),
+  end: new Date(addDays(new Date())),
   type: 'taxi',
-  offers: [],
-  price: parseInt(0, 10),
+  offersByType: [],
+  price: '',
   isFavorite: false,
   destination: BLANK_DESTINATION,
 };
@@ -34,6 +34,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const FilterType = {
@@ -52,6 +53,22 @@ export const SortType = {
 
 export const ChartName = {
   MONEY: 'money',
-  TRANSPORT: 'transport',
+  TYPE: 'type',
   TIMESPEND: 'time-spend',
 };
+
+export const TRANSFERS = [
+  'taxi',
+  'bus',
+  'train',
+  'ship',
+  'transport',
+  'drive',
+  'flight',
+];
+
+export const ACTIVITIES = [
+  'check-in',
+  'restaurant',
+  'sightseeing',
+];

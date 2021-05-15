@@ -10,7 +10,6 @@ export default class Filter {
     this._pointsModel = pointsModel;
 
     this._filterComponent = null;
-
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
 
@@ -18,8 +17,8 @@ export default class Filter {
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
-  init(isDisabled) {
-    const filters = this._getFilters(isDisabled);
+  init(isFiltersDisabled = false) {
+    const filters = this._getFilters(isFiltersDisabled);
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._filterModel.getFilter());
@@ -46,25 +45,8 @@ export default class Filter {
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
-  _getFilters(isDisabled) {
-    const points = !isDisabled ? this._pointsModel.getPoints() : [];
-
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: 'everything',
-        count: filter[FilterType.EVERYTHING](points).length,
-      },
-      {
-        type: FilterType.FUTURE,
-        name: 'future',
-        count: filter[FilterType.FUTURE](points).length,
-      },
-      {
-        type: FilterType.PAST,
-        name: 'past',
-        count: filter[FilterType.PAST](points).length,
-      },
-    ];
+  _getFilters(isFiltersDisabled) {
+    const points = !isFiltersDisabled ? this._pointsModel.getPoints() : [];
+    return Object.values(FilterType).map((type) => ({type, name: type, count: filter[type](points).length}));
   }
 }

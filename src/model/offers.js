@@ -6,19 +6,39 @@ export default class Offers extends Observer {
     this._offers = [];
   }
 
-  setOffers(offers) {
+  setOffers(updateType, offers) {
     this._offers = offers;
+    this._notify(updateType);
   }
 
   getOffers() {
     return this._offers;
   }
 
-  getOffersByType (type) {
-    return this._offers[type];
+  getOffersByType(type) {
+    return this._offers.find((offer) => offer.type === type).offers;
   }
 
-  getOffersTypes() {
-    return Object.keys(this._offers);
+  getOffersMap() {
+    return this._offers.reduce((acc, offer) => (acc[offer.type] = offer, acc), {});
+  }
+
+  static adaptToClient(offers) {
+    const adaptedOffers = [];
+
+    for (let i = 0; i < offers.offers.length; i++) {
+      adaptedOffers.push(Object.assign(
+        {},
+        offers.offers[i],
+        {
+          isChecked: offers.offers[i].isChecked,
+        },
+      ));
+    }
+
+    return {
+      type: offers.type,
+      offers: adaptedOffers,
+    };
   }
 }
