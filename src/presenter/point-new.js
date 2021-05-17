@@ -1,12 +1,12 @@
 import EditPointView  from '../view/edit-point.js';
-import {BLANK_POINT, UserAction, UpdateType} from '../utils/const.js';
+import {UserAction, UpdateType} from '../utils/const.js';
+import {BLANK_POINT} from '../utils/point.js';
 import {RenderPosition, render, remove} from '../utils/render.js';
 
 export default class PointNew {
-  constructor(pointContainer, tripPointButtonAddElement, noPointsComponent, changeData, destinationsModel, offersModel) {
+  constructor(pointContainer, buttonNewComponent, changeData, destinationsModel, offersModel) {
     this._pointContainer = pointContainer;
-    this._tripPointButtonAddElement = tripPointButtonAddElement;
-    this._noPointsComponent = noPointsComponent;
+    this._buttonNewComponent = buttonNewComponent;
     this._changeData = changeData;
     this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
@@ -19,30 +19,8 @@ export default class PointNew {
   }
 
   init() {
-    this._renderPointNew();
-  }
-
-  destroy() {
-    if (this._editPointComponent === null) {
-      return;
-    }
-
-    remove(this._editPointComponent);
-    this._editPointComponent = null;
-
-    this._tripPointButtonAddElement.disabled = false;
-
-    document.removeEventListener('keydown', this._escKeyDownHandler);
-  }
-
-  _renderPointNew() {
     if (this._editPointComponent !== null) {
       return;
-    }
-
-    if (this._noPointsComponent !== null) {
-      remove(this._noPointsComponent);
-      this._noPointsComponent = null;
     }
 
     this._point = BLANK_POINT;
@@ -56,18 +34,50 @@ export default class PointNew {
 
     render(this._pointContainer, this._editPointComponent, RenderPosition.AFTERBEGIN);
 
-    this._tripPointButtonAddElement.disabled = true;
+    this._buttonNewComponent.disabled = true;
 
     document.addEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  destroy() {
+    if (this._editPointComponent === null) {
+      return;
+    }
+
+    remove(this._editPointComponent);
+    this._editPointComponent = null;
+
+    this._buttonNewComponent.disabled = false;
+
+    document.removeEventListener('keydown', this._escKeyDownHandler);
+  }
+
+  setSaving() {
+    this._editPointComponent.updateState({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._editPointComponent.updateState({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._editPointComponent.shake(resetFormState);
   }
 
   _handleFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
-      UpdateType.MAJOR,
-      Object.assign({},point),
+      UpdateType.MINOR,
+      point,
     );
-    this.destroy();
+    this._buttonNewComponent.disabled = false;
   }
 
   _handleButtonDeleteClick() {

@@ -2,7 +2,8 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
-import {BLANK_POINT, TRANSFERS, ACTIVITIES} from '../utils/const.js';
+import {TRANSFERS, ACTIVITIES} from '../utils/const.js';
+import {BLANK_POINT} from '../utils/point.js';
 import {formatValueDate} from '../utils/date.js';
 
 const createDestinationsMarkup = (destinations) => {
@@ -59,13 +60,13 @@ const generateDestinationMarkup = (destination) => {
   );
 };
 
-const createTypesMarkup = (activeType, types) => {
+const createTypesMarkup = (activeType, types, isDisabled) => {
   return types
     .map((type, index) => {
       const isChecked = (activeType === type) ? 'checked' : '';
       return (
         `<div class="event__type-item">
-          <input id="event-type-${type.toLowerCase()}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}" ${isChecked}>
+          <input id="event-type-${type.toLowerCase()}-${index}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}" ${isChecked} ${isDisabled ? 'disabled' : ''}>
           <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-${index}">${type}</label>
         </div>`
       );
@@ -73,12 +74,12 @@ const createTypesMarkup = (activeType, types) => {
     .join('\n');
 };
 
-const createOfferListMarkup = (offers) => {
+const createOfferListMarkup = (offers, isDisabled) => {
   return offers
     .map(({title, price, isChecked}, index) => {
       return (
         `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-name-${index}" type="checkbox" name="event-offer-name" ${isChecked ? 'checked' : ''}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-name-${index}" type="checkbox" name="event-offer-name" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
         <label class="event__offer-label" for="event-offer-${title.toLowerCase()}" data-title="${title}">
           <span class="event__offer-title">${title}</span>
           +
@@ -90,11 +91,11 @@ const createOfferListMarkup = (offers) => {
     .join('\n');
 };
 
-const createOffersMarkup = (offers) => {
+const createOffersMarkup = (offers, isDisabled) => {
   if (!offers.length) {
     return '';
   }
-  const offersList = createOfferListMarkup(offers);
+  const offersList = createOfferListMarkup(offers, isDisabled);
 
   return (
     `<section class="event__section  event__section--offers">
@@ -117,14 +118,12 @@ const createRollUpButton = (isPointNew) => {
   );
 };
 
-const createEditPointTemplate = (data = {}, destinations, offersTypes) => {
-  const {start, end, destination, type, offers, price, isNew} = data;
-
+const createEditPointTemplate = (data = {}, destinations) => {
+  const {start, end, destination, type, offers, price, isNew, isDisabled, isSaving, isDeleting} = data;
   const destinationNames = destinations.map((destination) => destination.name);
   const destinationsList = createDestinationsMarkup(destinationNames);
   const destinationMarkup = generateDestinationMarkup(destination);
-  const offersListContainer = createOffersMarkup(offers);
-  //const types = offersTypes.map((offer) => offer.type);
+  const offersListContainer = createOffersMarkup(offers, isDisabled);
   const transfersList = createTypesMarkup(type, TRANSFERS);
   const activitiesList = createTypesMarkup(type, ACTIVITIES);
   const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
@@ -139,7 +138,7 @@ const createEditPointTemplate = (data = {}, destinations, offersTypes) => {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Transfer</legend>
@@ -155,7 +154,7 @@ const createEditPointTemplate = (data = {}, destinations, offersTypes) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type} ${preposition}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1">
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" autocomplete="on" required ${isDisabled ? 'disabled' : ''}>
             <datalist id="destination-list-1">
               ${destinationsList}
             </datalist>
@@ -164,25 +163,27 @@ const createEditPointTemplate = (data = {}, destinations, offersTypes) => {
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatValueDate(start)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatValueDate(start)}" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatValueDate(end)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatValueDate(end)}" ${isDisabled ? 'disabled' : ''}>
           </div>
           <div class="event__field-group  event__field-group--price">
             <label class="event__label" for="event-price-1">
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${he.encode(String(price))}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" required value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''}>
         </div>
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type=${isNew ? 'reset' : 'button'}>
-          ${isNew ? 'Cancel' : 'Delete'}
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabled ? 'disabled' : ''}>
+          ${isSaving ? 'Saving...' : 'Save'}
           </button>
-         ${rollUpButton}
+          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+            ${isNew ? 'Cancel' : isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
+            ${rollUpButton}
         </header>
         <section class="event__details">
           ${offersListContainer}
@@ -305,6 +306,7 @@ export default class EditPoint extends SmartView {
     evt.preventDefault();
     const currentDestination = evt.target.value;
     const destination = this._destinations.find((destination) => destination.name === currentDestination);
+
     if (!destination || !currentDestination) {
       evt.target.setCustomValidity('Please select the city from the list');
       return;
@@ -346,7 +348,7 @@ export default class EditPoint extends SmartView {
 
   _priceInputHandler(evt) {
     evt.preventDefault();
-    if (Number.isNaN(parseInt(evt.target.value, 10)) || (parseInt(evt.target.value, 10) <= 0)) {
+    if (Number.isNaN(parseInt(evt.target.value, 10)) || (parseInt(evt.target.value, 10) <= 0) || evt.target.value.length === 0) {
       evt.target.setCustomValidity('Please input some positive number');
       return;
     } else {
@@ -376,8 +378,9 @@ export default class EditPoint extends SmartView {
       this.getElement().querySelectorAll('.event__offer-selector').forEach((offer) =>
         offer.addEventListener('click', this._offersChangeHandler));
     }
+
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._destinationChangeHandler);
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);
   }
 
@@ -424,6 +427,9 @@ export default class EditPoint extends SmartView {
           description: point.destination.description,
           photos: point.destination.photos,
         },
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
       },
     );
   }
@@ -432,7 +438,10 @@ export default class EditPoint extends SmartView {
   static parseStateToDate(data) {
     data = Object.assign({}, data);
 
-    data.isNew = false;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+    delete data.isNew;
 
     return data;
   }

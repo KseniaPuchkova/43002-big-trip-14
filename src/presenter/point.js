@@ -9,6 +9,11 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
 export default class Point {
   constructor(pointContainer, changeData, changeMode, destinationsModel, offersModel) {
     this._pointContainer = pointContainer;
@@ -56,7 +61,8 @@ export default class Point {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._editPointComponent, prevEditPointComponent);
+      replace(this._pointComponent, prevEditPointComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -107,16 +113,14 @@ export default class Point {
     );
   }
 
-  _handleFormSubmit(point) {
-    const isMinorUpdate = !areDatesEqual(this._point.start, point.start) || this._point.price !== point.price || this._point.offers;
+  _handleFormSubmit(update) {
+    const isMinorUpdate = !areDatesEqual(this._point.start, update.start) || this._point.price !== update.price || this._point.offers;
 
     this._changeData(
       UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
-      point,
+      update,
     );
-    this._replaceEditToPoint();
-    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _escKeyDownHandler(evt) {
@@ -131,6 +135,35 @@ export default class Point {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToPoint();
+    }
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._editPointComponent.updateState({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editPointComponent.updateState({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editPointComponent.updateState({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._pointComponent.shake(resetFormState);
+        this._editPointComponent.shake(resetFormState);
+        break;
     }
   }
 

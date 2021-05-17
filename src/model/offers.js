@@ -19,10 +19,6 @@ export default class Offers extends Observer {
     return this._offers.find((offer) => offer.type === type).offers;
   }
 
-  getOffersMap() {
-    return this._offers.reduce((acc, offer) => (acc[offer.type] = offer, acc), {});
-  }
-
   static adaptToClient(offers) {
     const adaptedOffers = [];
 

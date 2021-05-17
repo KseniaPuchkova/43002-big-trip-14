@@ -68,6 +68,7 @@ export default class Points extends Observer {
       ));
     }
 
+
     const adaptedPoint = Object.assign({},
       point,
       {
@@ -114,8 +115,8 @@ export default class Points extends Observer {
       {
         'date_from': point.start.toISOString(),
         'date_to': point.end.toISOString(),
-        'base_price': point.price,
-        'is_favorite': point.isFavorite,
+        'base_price': point.price ? point.price : null,
+        'is_favorite': point.isFavorite ? point.isFavorite : false,
         destination: Object.assign(
           {},
           point.destination,
@@ -130,9 +131,10 @@ export default class Points extends Observer {
     delete adaptedPoint.start;
     delete adaptedPoint.end;
     delete adaptedPoint.price;
-    delete adaptedPoint.photos;
+    delete adaptedPoint.destination.photos;
     delete adaptedPoint.isFavorite;
     delete adaptedPoint.offers.isChecked;
+    delete adaptedPoint.isNew;
 
     return adaptedPoint;
   }

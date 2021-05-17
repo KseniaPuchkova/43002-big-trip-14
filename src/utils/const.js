@@ -1,24 +1,3 @@
-import {nanoid} from 'nanoid';
-import {addDays} from '../utils/date.js';
-
-const BLANK_DESTINATION = {
-  name: '',
-  description: '',
-  photos: [],
-};
-
-export const BLANK_POINT = {
-  id: nanoid(),
-  isNew: true,
-  start: new Date(),
-  end: new Date(addDays(new Date())),
-  type: 'taxi',
-  offersByType: [],
-  price: '',
-  isFavorite: false,
-  destination: BLANK_DESTINATION,
-};
-
 export const MenuItem = {
   TABLE: 'TABLE',
   STATS: 'STATS',

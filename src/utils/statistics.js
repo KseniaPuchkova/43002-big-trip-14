@@ -1,12 +1,6 @@
 import dayjs from 'dayjs';
 
 export const BAR_HEIGHT = 55;
-export const DATA_LABELS_FONT_SIZE = 'MONEY';
-export const TITLE_FONT_SIZE = 23;
-export const BAR_THICKNESS = 44;
-export const MIN_BAR_LENGTH = 50;
-export const MIN_BAR_LENGTH_TIMES = 100;
-export const PADDING = 5;
 
 export const getTypesUnique = (points) => Array.from(new Set(points.slice().map((point) => point.type.toUpperCase())));
 
