@@ -15,11 +15,6 @@ export default class Destinations extends Observer {
     return this._destinations;
   }
 
-  getDestinationsMap() {
-    return this._destinations.reduce((acc, destination) => (acc[destination.name] = destination, acc), {});
-  }
-
-
   static adaptToClient(destination) {
     const adaptedDestination = Object.assign(
       {},

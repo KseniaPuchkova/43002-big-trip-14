@@ -1,5 +1,20 @@
 import {SortType} from '../utils/const.js';
-import {formatMonthDay} from '../utils/date.js';
+import {formatMonthDay, addDays} from '../utils/date.js';
+
+export const BLANK_POINT = {
+  isNew: true,
+  start: new Date(),
+  end: new Date(addDays(new Date())),
+  type: 'taxi',
+  price: '',
+  offers: [],
+  isFavorite: false,
+  destination: {
+    name: '',
+    description: '',
+    photos: [],
+  },
+};
 
 export const getTripPoints = (points) => {
   if (points.length <= 3) {

@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {TRANSFERS, ACTIVITIES} from '../utils/const.js';
+import {TRANSFERS} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
@@ -18,8 +18,8 @@ const generateOffersMarkup = (offers) => {
   return '';
 };
 
-const createPointTemplate = ({start, end, destination, price, type, offers, isFavorite} = {}) => {
-
+const createPointTemplate = (data = {}) => {
+  const {start, end, destination, price, type, offers, isFavorite} = data;
   const offersList = generateOffersMarkup(offers);
   const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
 
@@ -83,9 +83,7 @@ export default class Point extends AbstractView {
 
   setButtonOpenClickHandler(callback) {
     this._callback.click = callback;
-    if (this._data.isNew !== 'new') {
-      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonOpenClickHandler);
-    }
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonOpenClickHandler);
   }
 
   setFavoriteClickHandler(callback) {

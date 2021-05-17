@@ -4,7 +4,7 @@ import LoadingView from '../view/loading.js';
 import SortView  from '../view/sort.js';
 import PointsListView  from '../view/points-list.js';
 import NoPointsView  from '../view/no-points.js';
-import PointPresenter from './point.js';
+import PointPresenter, {State as PointPresenterViewState} from './point.js';
 import PointNewPresenter from './point-new.js';
 import {RenderPosition, render, remove, showContainerlineElement, hideContainerlineElement} from '../utils/render.js';
 import {getSortedItems, getTotalPrice} from '../utils/point.js';
@@ -12,10 +12,10 @@ import {SortType, FilterType, UpdateType, UserAction} from '../utils/const.js';
 import {filter} from '../utils/filter.js';
 
 export default class Trip {
-  constructor(tripMainElement, tripEventsElement, tripPointButtonAddElement, pointsModel, filterModel, destinationsModel, offersModel, api) {
+  constructor(tripMainElement, tripEventsElement, buttonNewComponent, pointsModel, filterModel, destinationsModel, offersModel, api) {
     this._tripMainElement = tripMainElement;
     this._tripEventsElement = tripEventsElement;
-    this._tripPointButtonAddElement = tripPointButtonAddElement;
+    this._buttonNewComponent = buttonNewComponent;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._destinationsModel = destinationsModel;
@@ -39,7 +39,7 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._pointNewPresenter = new PointNewPresenter(this._pointsListComponent, this._tripPointButtonAddElement, this._noPointsComponent, this._handleViewAction, this._destinationsModel, this._offersModel);
+    this._pointNewPresenter = new PointNewPresenter(this._pointsListComponent, this._buttonNewComponent, this._handleViewAction, this._destinationsModel, this._offersModel);
   }
 
   init() {
@@ -53,10 +53,8 @@ export default class Trip {
 
   createPoint() {
     this.restoreDefaults();
-
     if (this._noPointsComponent !== null) {
       remove(this._noPointsComponent);
-      this._noPointsComponent.getElement().classList.add('visually-hidden');
     }
 
     this._pointNewPresenter.init();
@@ -69,6 +67,8 @@ export default class Trip {
 
     this._pointsModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
+    this._destinationsModel.addObserver(this._handleModelEvent);
+    this._offersModel.addObserver(this._handleModelEvent);
   }
 
   restoreDefaults() {
@@ -96,15 +96,34 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._api.updatePoint(update).then((response) => {
-          this._pointsModel.updatePoint(updateType,response);
-        });
+        this._pointPresenters[update.id].setViewState(PointPresenterViewState.SAVING);
+        this._api.updatePoint(update)
+          .then((response) => {
+            this._pointsModel.updatePoint(updateType,response);
+          })
+          .catch(() => {
+            this._pointPresenters[update.id].setViewState(PointPresenterViewState.ABORTING);
+          });
         break;
       case UserAction.ADD_POINT:
-        this._pointsModel.addPoint(updateType, update);
+        this._pointNewPresenter.setSaving();
+        this._api.addPoint(update)
+          .then((response) => {
+            this._pointsModel.addPoint(updateType,response);
+          })
+          .catch(() => {
+            this._pointNewPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_POINT:
-        this._pointsModel.deletePoint(updateType, update);
+        this._pointPresenters[update.id].setViewState(PointPresenterViewState.DELETING);
+        this._api.deletePoint(update)
+          .then(() => {
+            this._pointsModel.deletePoint(updateType, update);
+          })
+          .catch(() => {
+            this._pointPresenters[update.id].setViewState(PointPresenterViewState.ABORTING);
+          });
         break;
     }
   }
