@@ -2,7 +2,7 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
-import {TRANSFERS, ACTIVITIES} from '../utils/const.js';
+import {Transfer, Activity} from '../utils/const.js';
 import {BLANK_POINT} from '../utils/point.js';
 import {formatValueDate} from '../utils/date.js';
 
@@ -124,9 +124,9 @@ const createEditPointTemplate = (data = {}, destinations) => {
   const destinationsList = createDestinationsMarkup(destinationNames);
   const destinationMarkup = generateDestinationMarkup(destination);
   const offersListContainer = createOffersMarkup(offers, isDisabled);
-  const transfersList = createTypesMarkup(type, TRANSFERS);
-  const activitiesList = createTypesMarkup(type, ACTIVITIES);
-  const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
+  const transfersList = createTypesMarkup(type, Object.values(Transfer));
+  const activitiesList = createTypesMarkup(type, Object.values(Activity));
+  const preposition = Object.values(Transfer).includes(type) ? 'to' : 'in';
   const rollUpButton = createRollUpButton(isNew);
 
   return (
