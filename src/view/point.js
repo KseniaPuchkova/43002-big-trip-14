@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {TRANSFERS} from '../utils/const.js';
+import {Transfer} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
@@ -21,7 +21,7 @@ const generateOffersMarkup = (offers) => {
 const createPointTemplate = (data = {}) => {
   const {start, end, destination, price, type, offers, isFavorite} = data;
   const offersList = generateOffersMarkup(offers);
-  const preposition = TRANSFERS.includes(type) ? 'to' : 'in';
+  const preposition = Object.values(Transfer).includes(type) ? 'to' : 'in';
 
   return (
     `<li class="trip-events__item">

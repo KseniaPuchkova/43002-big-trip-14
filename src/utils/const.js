@@ -1,3 +1,19 @@
+export const Transfer = {
+  TAXI: 'taxi',
+  BUS: 'bus',
+  TRAIN: 'train',
+  SHIP: 'ship',
+  TRANSPORT: 'transport',
+  DRVE: 'drive',
+  FLIGHT: 'flight',
+};
+
+export const Activity = {
+  CHECK_IN: 'check-in',
+  RESTAURANT: 'restaurant',
+  SIGHTSEEING: 'sightseeing',
+};
+
 export const MenuItem = {
   TABLE: 'TABLE',
   STATS: 'STATS',
@@ -35,19 +51,3 @@ export const ChartName = {
   TYPE: 'type',
   TIMESPEND: 'time-spend',
 };
-
-export const TRANSFERS = [
-  'taxi',
-  'bus',
-  'train',
-  'ship',
-  'transport',
-  'drive',
-  'flight',
-];
-
-export const ACTIVITIES = [
-  'check-in',
-  'restaurant',
-  'sightseeing',
-];
