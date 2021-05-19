@@ -53,6 +53,7 @@ export default class Trip {
 
   createPoint() {
     this.restoreDefaults();
+
     if (this._noPointsComponent !== null) {
       remove(this._noPointsComponent);
     }

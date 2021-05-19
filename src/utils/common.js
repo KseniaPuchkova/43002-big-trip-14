@@ -17,3 +17,6 @@ export const getShuffleArray = (array, min = 0, max = array.length) => {
   return array.slice().sort(() => Math.random() - 0.5).slice(0, getRandomIntegerNumber(min, max));
 };
 
+export const isOnline = () => {
+  return window.navigator.onLine;
+};

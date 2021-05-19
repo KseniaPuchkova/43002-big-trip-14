@@ -34,7 +34,7 @@ export default class PointNew {
 
     render(this._pointContainer, this._editPointComponent, RenderPosition.AFTERBEGIN);
 
-    this._buttonNewComponent.disabled = true;
+    this._buttonNewComponent.addDisabled();
 
     document.addEventListener('keydown', this._escKeyDownHandler);
   }
@@ -47,7 +47,7 @@ export default class PointNew {
     remove(this._editPointComponent);
     this._editPointComponent = null;
 
-    this._buttonNewComponent.disabled = false;
+    this._buttonNewComponent.removeDisabled();
 
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
@@ -77,7 +77,8 @@ export default class PointNew {
       UpdateType.MINOR,
       point,
     );
-    this._buttonNewComponent.disabled = false;
+
+    this._buttonNewComponent.removeDisabled();
   }
 
   _handleButtonDeleteClick() {

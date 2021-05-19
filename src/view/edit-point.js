@@ -154,7 +154,7 @@ const createEditPointTemplate = (data = {}, destinations) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type} ${preposition}
             </label>
-            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" autocomplete="on" required ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''} autocomplete="on" required>
             <datalist id="destination-list-1">
               ${destinationsList}
             </datalist>
@@ -175,7 +175,7 @@ const createEditPointTemplate = (data = {}, destinations) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" required value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''} required>
         </div>
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabled ? 'disabled' : ''}>
           ${isSaving ? 'Saving...' : 'Save'}

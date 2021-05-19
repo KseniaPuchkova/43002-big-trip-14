@@ -2,7 +2,7 @@ import AbstractView from './abstract.js';
 
 export const createSiteMenuTemplate = () => {
   return (
-    `<nav class="trip-controls__trip-tabs  trip-tabs">
+    `<nav class="trip-controls__trip-tabs  trip-tabs" disabled>
       <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
       <a class="trip-tabs__btn" href="#">Stats</a>
    </nav>`
@@ -19,8 +19,18 @@ export default class SiteMenu extends AbstractView {
     return createSiteMenuTemplate();
   }
 
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName !== 'A' || evt.target.classList.contains('trip-tabs__btn--active')) {
+      return;
+    }
+
+    this._callback.menuClick(evt.target.textContent.toUpperCase());
+  }
+
   setMenuItem(menuItem) {
     const buttonsMenu = this.getElement().querySelectorAll('.trip-tabs__btn');
+
     buttonsMenu.forEach((buttonMenu) => {
       if (buttonMenu.textContent.toUpperCase() === menuItem) {
         buttonMenu.classList.add('trip-tabs__btn--active');
@@ -30,17 +40,16 @@ export default class SiteMenu extends AbstractView {
     });
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    if (evt.target.tagName !== 'A') {
-      return;
-    }
-
-    this._callback.menuClick(evt.target.textContent.toUpperCase());
-  }
-
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().addEventListener('click', this._menuClickHandler);
+  }
+
+  hideMenu() {
+    this.getElement().classList.add('visually-hidden');
+  }
+
+  showMenu() {
+    this.getElement().classList.remove('visually-hidden');
   }
 }
