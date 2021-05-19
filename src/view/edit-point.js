@@ -244,14 +244,14 @@ export default class EditPoint extends SmartView {
     this._startDatepicker = flatpickr(
       this.getElement().querySelector('#event-start-time-1'),
       {
-        mode: 'single',
-        enableTime: true,
-        altInput: true,
-        time_24hr: true,
-        dateFormat: 'd/m/y H:i',
-        altFormat: 'd/m/y H:i',
-        defaultDate: this._stateData.start,
-        onChange: this._startDateChangeHandler,
+        'mode': 'single',
+        'enableTime': true,
+        'altInput': true,
+        'time_24hr': true,
+        'dateFormat': 'd/m/y H:i',
+        'altFormat': 'd/m/y H:i',
+        'defaultDate': this._stateData.start,
+        'onChange': this._startDateChangeHandler,
       },
     );
   }
@@ -265,15 +265,15 @@ export default class EditPoint extends SmartView {
     this._endDatepicker = flatpickr(
       this.getElement().querySelector('#event-end-time-1'),
       {
-        mode: 'single',
-        enableTime: true,
-        altInput: true,
-        time_24hr: true,
-        dateFormat: 'd/m/y H:i',
-        altFormat: 'd/m/y H:i',
-        defaultDate: this._stateData.end,
-        minDate: this._stateData.start,
-        onChange: this._endDateChangeHandler,
+        'mode': 'single',
+        'enableTime': true,
+        'altInput': true,
+        'time_24hr': true,
+        'dateFormat': 'd/m/y H:i',
+        'altFormat': 'd/m/y H:i',
+        'defaultDate': this._stateData.end,
+        'minDate': this._stateData.start,
+        'onChange': this._endDateChangeHandler,
       },
     );
   }
