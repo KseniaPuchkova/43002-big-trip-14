@@ -28,7 +28,7 @@ export default class ButtonNew extends Abstract {
     this.getElement().addEventListener('click', this._buttonClickHandler);
   }
 
-  setDisabled() {
+  addDisabled() {
     this.getElement().disabled = true;
   }
 

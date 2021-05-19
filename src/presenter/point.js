@@ -1,5 +1,7 @@
 import EditPointView  from '../view/edit-point.js';
 import PointView  from '../view/point.js';
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast.js';
 import {UserAction, UpdateType} from '../utils/const.js';
 import {areDatesEqual} from '../utils/date.js';
 import {RenderPosition, render, replace, remove} from '../utils/render.js';
@@ -85,6 +87,11 @@ export default class Point {
   }
 
   _handleButtonOpenClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+      return;
+    }
+
     this._replacePointToEdit();
     this._editPointComponent.reset(this._point);
     document.addEventListener('keydown', this._escKeyDownHandler);
@@ -96,6 +103,11 @@ export default class Point {
   }
 
   _handleButtonDeleteClick(point) {
+    if (!isOnline()) {
+      toast('You can\'t delete point offline');
+      return;
+    }
+
     this._changeData(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
@@ -106,7 +118,7 @@ export default class Point {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       Object.assign({}, this._point,{
         isFavorite: !this._point.isFavorite,
       }),
@@ -114,6 +126,11 @@ export default class Point {
   }
 
   _handleFormSubmit(update) {
+    if (!isOnline()) {
+      toast('You can\'t save point offline');
+      return;
+    }
+
     const isMinorUpdate = !areDatesEqual(this._point.start, update.start) || this._point.price !== update.price || this._point.offers;
 
     this._changeData(
