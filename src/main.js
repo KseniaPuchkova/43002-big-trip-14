@@ -15,7 +15,7 @@ import Api from './api/api.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
 
-const AUTHORIZATION = 'Basic 7RUkyeQDQt5JBhJZOo25a';
+const AUTHORIZATION = 'Basic 7RUkyeQDQt5JBhJZOo45a';
 const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 const STORE_PREFIX = 'bigtrip-localstorage';
 const STORE_VER = 'v14';
@@ -71,7 +71,7 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.hideTripline();
       tripPresenter.destroy();
       filterPresenter.init(true);
-      statisticsComponent = new StatisticsView(pointsModel.getPoints());
+      statisticsComponent = new StatisticsView(pointsModel.get());
       render(tripEventsElement, statisticsComponent, RenderPosition.BEFOREEND);
       siteMenuComponent.setMenuItem(MenuItem.STATS);
       buttonNewComponent.addDisabled();
@@ -86,18 +86,18 @@ Promise
     apiWithProvider.getPoints(),
   ])
   .then(([offers, destinations, points]) => {
-    offersModel.setOffers(UpdateType.INIT, offers);
-    destinationsModel.setDestinations(UpdateType.INIT, destinations);
-    pointsModel.setPoints(UpdateType.INIT, points);
+    offersModel.set(UpdateType.INIT, offers);
+    destinationsModel.set(UpdateType.INIT, destinations);
+    pointsModel.set(UpdateType.INIT, points);
     render(tripControlsNavigationElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
     siteMenuComponent.showMenu();
     buttonNewComponent.removeDisabled();
   })
   .catch(() => {
-    offersModel.setOffers(UpdateType.INIT, []);
-    destinationsModel.setDestinations(UpdateType.INIT, []);
-    pointsModel.setPoints(UpdateType.INIT, []);
+    offersModel.set(UpdateType.INIT, []);
+    destinationsModel.set(UpdateType.INIT, []);
+    pointsModel.set(UpdateType.INIT, []);
     render(tripControlsNavigationElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });

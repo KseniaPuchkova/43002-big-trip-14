@@ -126,7 +126,6 @@ const createEditPointTemplate = (data = {}, destinations) => {
   const offersListContainer = createOffersMarkup(offers, isDisabled);
   const transfersList = createTypesMarkup(type, Object.values(Transfer));
   const activitiesList = createTypesMarkup(type, Object.values(Activity));
-  const preposition = Object.values(Transfer).includes(type) ? 'to' : 'in';
   const rollUpButton = createRollUpButton(isNew);
 
   return (
@@ -152,7 +151,7 @@ const createEditPointTemplate = (data = {}, destinations) => {
           </div>
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-              ${type} ${preposition}
+              ${type}
             </label>
             <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''} autocomplete="on" required>
             <datalist id="destination-list-1">
@@ -175,7 +174,7 @@ const createEditPointTemplate = (data = {}, destinations) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''} required>
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''} required>
         </div>
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabled ? 'disabled' : ''}>
           ${isSaving ? 'Saving...' : 'Save'}
@@ -220,6 +219,42 @@ export default class EditPoint extends SmartView {
     this._setEndDatepicker();
   }
 
+  getTemplate() {
+    return createEditPointTemplate(this._stateData, this._destinations, this._offers);
+  }
+
+  setButtonCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+    if (!this._stateData.isNew) {
+      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonCloseClickHandler);
+    }
+  }
+
+  setButtonDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._buttonDeleteClickHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  restoreHandlers() {
+    this.setButtonCloseClickHandler(this._callback.closeClick);
+    this.setButtonDeleteClickHandler(this._callback.deleteClick);
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this._setInnerHandlers();
+    this._setStartDatepicker();
+    this._setEndDatepicker();
+  }
+
+  reset(point) {
+    this.updateState(
+      EditPoint.parseDataToState(point),
+    );
+  }
+
   removeElement() {
     super.removeElement();
 
@@ -229,10 +264,6 @@ export default class EditPoint extends SmartView {
       this._endDatepicker.destroy();
       this._endDatepicker = null;
     }
-  }
-
-  getTemplate() {
-    return createEditPointTemplate(this._stateData, this._destinations, this._offers);
   }
 
   _setStartDatepicker() {
@@ -320,6 +351,10 @@ export default class EditPoint extends SmartView {
 
   _typeChangeHandler(evt) {
     evt.preventDefault();
+    if (!evt.target.classList.contains('event__type-label')) {
+      return;
+    }
+
     const type = evt.target.textContent;
     const offers = this._offers.find((offer) => offer.type === type).offers;
 
@@ -382,38 +417,6 @@ export default class EditPoint extends SmartView {
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._destinationChangeHandler);
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);
-  }
-
-  setButtonCloseClickHandler(callback) {
-    this._callback.closeClick = callback;
-    if (!this._stateData.isNew) {
-      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonCloseClickHandler);
-    }
-  }
-
-  setButtonDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._buttonDeleteClickHandler);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
-  }
-
-  restoreHandlers() {
-    this.setButtonCloseClickHandler(this._callback.closeClick);
-    this.setButtonDeleteClickHandler(this._callback.deleteClick);
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this._setInnerHandlers();
-    this._setStartDatepicker();
-    this._setEndDatepicker();
-  }
-
-  reset(point) {
-    this.updateState(
-      EditPoint.parseDataToState(point),
-    );
   }
 
   static parseDataToState(point) {

@@ -6,16 +6,16 @@ export default class Offers extends Observer {
     this._offers = [];
   }
 
-  setOffers(updateType, offers) {
+  set(updateType, offers) {
     this._offers = offers;
     this._notify(updateType);
   }
 
-  getOffers() {
+  get() {
     return this._offers;
   }
 
-  getOffersByType(type) {
+  getByType(type) {
     return this._offers.find((offer) => offer.type === type).offers;
   }
 

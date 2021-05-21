@@ -4,14 +4,14 @@ export const Transfer = {
   TRAIN: 'train',
   SHIP: 'ship',
   TRANSPORT: 'transport',
-  DRVE: 'drive',
+  DRIVE: 'drive',
   FLIGHT: 'flight',
 };
 
 export const Activity = {
   CHECK_IN: 'check-in',
-  RESTAURANT: 'restaurant',
   SIGHTSEEING: 'sightseeing',
+  RESTAURANT: 'restaurant',
 };
 
 export const MenuItem = {

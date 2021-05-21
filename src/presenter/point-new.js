@@ -24,9 +24,9 @@ export default class PointNew {
     }
 
     this._point = BLANK_POINT;
-    BLANK_POINT.offers = this._offersModel.getOffersByType(BLANK_POINT.type);
-    this._destinations = this._destinationsModel.getDestinations();
-    this._offers = this._offersModel.getOffers();
+    BLANK_POINT.offers = this._offersModel.getByType(BLANK_POINT.type);
+    this._destinations = this._destinationsModel.get();
+    this._offers = this._offersModel.get();
 
     this._editPointComponent = new EditPointView(this._point, this._destinations, this._offers);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);

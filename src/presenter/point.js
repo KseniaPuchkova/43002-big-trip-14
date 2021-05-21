@@ -38,8 +38,8 @@ export default class Point {
 
   init(point) {
     this._point = point;
-    this._destinations = this._destinationsModel.getDestinations();
-    this._offers = this._offersModel.getOffers();
+    this._destinations = this._destinationsModel.get();
+    this._offers = this._offersModel.get();
 
     const prevPointComponent = this._pointComponent;
     const prevEditPointComponent = this._editPointComponent;
@@ -71,18 +71,56 @@ export default class Point {
     remove(prevEditPointComponent);
   }
 
-  _renderPointsList() {
-    render(this._tripContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
+  setViewState(state) {
+    const resetFormState = () => {
+      this._editPointComponent.updateState({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editPointComponent.updateState({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._editPointComponent.updateState({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._pointComponent.shake(resetFormState);
+        this._editPointComponent.shake(resetFormState);
+        break;
+    }
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditToPoint();
+    }
+  }
+
+  destroy() {
+    remove(this._pointComponent);
+    remove(this._editPointComponent);
   }
 
   _replacePointToEdit() {
     replace(this._editPointComponent, this._pointComponent);
+    document.addEventListener('keydown', this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _replaceEditToPoint() {
     replace(this._pointComponent, this._editPointComponent);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
     this._mode = Mode.DEFAULT;
   }
 
@@ -94,12 +132,15 @@ export default class Point {
 
     this._replacePointToEdit();
     this._editPointComponent.reset(this._point);
-    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleButtonCloseClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+      return;
+    }
+
     this._replaceEditToPoint();
-    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleButtonDeleteClick(point) {
@@ -147,45 +188,5 @@ export default class Point {
       this._replaceEditToPoint();
       document.removeEventListener('keydown', this._escKeyDownHandler);
     }
-  }
-
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._replaceEditToPoint();
-    }
-  }
-
-  setViewState(state) {
-    const resetFormState = () => {
-      this._editPointComponent.updateState({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    switch (state) {
-      case State.SAVING:
-        this._editPointComponent.updateState({
-          isDisabled: true,
-          isSaving: true,
-        });
-        break;
-      case State.DELETING:
-        this._editPointComponent.updateState({
-          isDisabled: true,
-          isDeleting: true,
-        });
-        break;
-      case State.ABORTING:
-        this._pointComponent.shake(resetFormState);
-        this._editPointComponent.shake(resetFormState);
-        break;
-    }
-  }
-
-  destroy() {
-    remove(this._pointComponent);
-    remove(this._editPointComponent);
   }
 }

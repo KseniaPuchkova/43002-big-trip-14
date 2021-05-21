@@ -74,7 +74,7 @@ export default class Trip {
 
   restoreDefaults() {
     this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._filterModel.set(UpdateType.MAJOR, FilterType.EVERYTHING);
   }
 
   showTripline() {
@@ -86,12 +86,132 @@ export default class Trip {
   }
 
   _getPoints() {
-    const filterType = this._filterModel.getFilter();
-    const points = this._pointsModel.getPoints();
+    const filterType = this._filterModel.get();
+    const points = this._pointsModel.get();
     const filtredPoints = filter[filterType](points);
 
     this._sortedPoints = getSortedItems(filtredPoints, this._currentSortType);
     return filtredPoints;
+  }
+
+  _renderLoading() {
+    render(this._tripEventsElement, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  _renderTripInfo() {
+    if (this._tripInfoComponent !== null) {
+      remove(this._tripInfoComponent);
+      this._tripInfoComponent = null;
+    }
+
+    this._tripInfoComponent = new TripInfoView(this._sortedPoints);
+    render(this._tripMainElement, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  _renderTotalPrice() {
+    if (this._totalPriceComponent !== null) {
+      remove(this._totalPriceComponent);
+      this._totalPriceComponent = null;
+    }
+
+    const totalPrice = getTotalPrice(this._getPoints());
+    this._totalPriceComponent = new TotalPriceView(totalPrice);
+    render(this._tripInfoComponent, this._totalPriceComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderSort() {
+    if (this._sortComponent !== null) {
+      remove(this._sortComponent);
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new SortView(this._currentSortType);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+
+    render(this._tripEventsElement, this._sortComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderPointsList() {
+    render(this._tripEventsElement, this._pointsListComponent, RenderPosition.BEFOREEND);
+  }
+
+  _renderPoint(point) {
+    const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange, this._destinationsModel, this._offersModel);
+    pointPresenter.init(point);
+    this._pointPresenters[point.id] = pointPresenter;
+  }
+
+  _renderPoints() {
+    this._sortedPoints.forEach((point) => {
+      this._renderPoint(point);
+    });
+  }
+
+  _renderNoPoints() {
+    this.hideTripline();
+    render(this._tripEventsElement, this._noPointsComponent, RenderPosition.AFTERBEGIN);
+    remove(this._sortComponent);
+  }
+
+  _renderTrip() {
+    if (this._isLoading) {
+      this._renderLoading();
+      this.hideTripline();
+      return;
+    }
+
+    if (this._getPoints().length === 0) {
+      this._renderNoPoints();
+
+      remove(this._tripInfoComponent);
+      remove(this._totalPriceComponent);
+      return;
+    }
+
+    remove(this._noPointsComponent);
+
+    this.showTripline();
+
+    this._renderTripInfo();
+    this._renderTotalPrice();
+    this._renderSort();
+    this._renderPointsList();
+    this._renderPoints();
+  }
+
+  _clearPointsPresenters() {
+    Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
+    this._pointPresenters = {};
+  }
+
+  _clearTrip({resetSortType = false} = {}) {
+    this._pointNewPresenter.destroy();
+
+    Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
+    this._pointPresenters = {};
+
+    remove(this._sortComponent);
+    remove(this._noPointsComponent);
+    remove(this._loadingComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
+    }
+  }
+
+  _handleModeChange() {
+    this._pointNewPresenter.destroy();
+    Object.values(this._pointPresenters).forEach((presenter) => presenter.resetView());
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+    this._clearTrip();
+    this._renderTrip();
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -100,7 +220,7 @@ export default class Trip {
         this._pointPresenters[update.id].setViewState(PointPresenterViewState.SAVING);
         this._api.updatePoint(update)
           .then((response) => {
-            this._pointsModel.updatePoint(updateType,response);
+            this._pointsModel.update(updateType,response);
           })
           .catch(() => {
             this._pointPresenters[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -110,7 +230,7 @@ export default class Trip {
         this._pointNewPresenter.setSaving();
         this._api.addPoint(update)
           .then((response) => {
-            this._pointsModel.addPoint(updateType,response);
+            this._pointsModel.add(updateType,response);
           })
           .catch(() => {
             this._pointNewPresenter.setAborting();
@@ -120,7 +240,7 @@ export default class Trip {
         this._pointPresenters[update.id].setViewState(PointPresenterViewState.DELETING);
         this._api.deletePoint(update)
           .then(() => {
-            this._pointsModel.deletePoint(updateType, update);
+            this._pointsModel.delete(updateType, update);
           })
           .catch(() => {
             this._pointPresenters[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -149,125 +269,5 @@ export default class Trip {
         this._renderTrip();
         break;
     }
-  }
-
-  _handleModeChange() {
-    this._pointNewPresenter.destroy();
-    Object.values(this._pointPresenters).forEach((presenter) => presenter.resetView());
-  }
-
-  _renderLoading() {
-    render(this._tripEventsElement, this._loadingComponent, RenderPosition.AFTERBEGIN);
-  }
-
-  _renderTripInfo() {
-    if (this._tripInfoComponent !== null) {
-      remove(this._tripInfoComponent);
-      this._tripInfoComponent = null;
-    }
-
-    this._tripInfoComponent = new TripInfoView(this._sortedPoints);
-    render(this._tripMainElement, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
-  }
-
-  _renderTotalPrice() {
-    if (this._totalPriceComponent !== null) {
-      remove(this._totalPriceComponent);
-      this._totalPriceComponent = null;
-    }
-
-    const totalPrice = getTotalPrice(this._getPoints());
-    this._totalPriceComponent = new TotalPriceView(totalPrice);
-    render(this._tripInfoComponent, this._totalPriceComponent, RenderPosition.BEFOREEND);
-  }
-
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-
-    this._currentSortType = sortType;
-    this._clearTrip();
-    this._renderTrip();
-  }
-
-  _renderPointsList() {
-    render(this._tripEventsElement, this._pointsListComponent, RenderPosition.BEFOREEND);
-  }
-
-  _renderPoint(point) {
-    const pointPresenter = new PointPresenter(this._pointsListComponent, this._handleViewAction, this._handleModeChange, this._destinationsModel, this._offersModel);
-    pointPresenter.init(point);
-    this._pointPresenters[point.id] = pointPresenter;
-  }
-
-  _renderNoPoints() {
-    this.hideTripline();
-    render(this._tripEventsElement, this._noPointsComponent, RenderPosition.AFTERBEGIN);
-    remove(this._sortComponent);
-  }
-
-  _renderPoints() {
-    this._sortedPoints.forEach((point) => {
-      this._renderPoint(point);
-    });
-  }
-
-  _renderSort() {
-    if (this._sortComponent !== null) {
-      remove(this._sortComponent);
-      this._sortComponent = null;
-    }
-
-    this._sortComponent = new SortView(this._currentSortType);
-    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-
-    render(this._tripEventsElement, this._sortComponent, RenderPosition.BEFOREEND);
-  }
-
-  _clearPointsPresenters() {
-    Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
-    this._pointPresenters = {};
-  }
-
-  _clearTrip({resetSortType = false} = {}) {
-    this._pointNewPresenter.destroy();
-
-    Object.values(this._pointPresenters).forEach((presenter) => presenter.destroy());
-    this._pointPresenters = {};
-
-    remove(this._sortComponent);
-    remove(this._noPointsComponent);
-    remove(this._loadingComponent);
-
-    if (resetSortType) {
-      this._currentSortType = SortType.DEFAULT;
-    }
-  }
-
-  _renderTrip() {
-    if (this._isLoading) {
-      this._renderLoading();
-      this.hideTripline();
-      return;
-    }
-
-    if (this._getPoints().length === 0) {
-      this._renderNoPoints();
-
-      remove(this._tripInfoComponent);
-      remove(this._totalPriceComponent);
-      return;
-    }
-
-    remove(this._noPointsComponent);
-
-    this.showTripline();
-
-    this._renderTripInfo();
-    this._renderTotalPrice();
-    this._renderSort();
-    this._renderPointsList();
-    this._renderPoints();
   }
 }

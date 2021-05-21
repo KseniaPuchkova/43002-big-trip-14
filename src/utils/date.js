@@ -33,25 +33,23 @@ export const formatMonthDay = (date) => {
 export const formatDiffDate = (start, end) => {
   const diffDate = dayjs.duration((dayjs(end).diff(dayjs(start))));
 
-  const days = diffDate.days() === 0 ? '' : diffDate.days() + 'D ';
-  const hours = diffDate.hours() === 0 ? '' : diffDate.hours() + 'H ';
-  const minutes = diffDate.minutes() === 0 ? '' : diffDate.minutes() + 'M';
+  const days = diffDate.days() === 0 ? '' : String(diffDate.days()).padStart(2, '0') + 'D ';
+  const hours = (diffDate.hours() === 0 && diffDate.days() === 0) ? '' : String(diffDate.hours()).padStart(2, '0') + 'H ';
+  const minutes = String(diffDate.minutes()).padStart(2, '0') + 'M';
 
   return `${days} ${hours} ${minutes}`;
-
 };
 
 export const formatDuration = (duration) => {
-  const daysDuration = dayjs.duration(duration);
-  const hoursDuration = dayjs.duration(duration);
-  const minutesDuration = dayjs.duration(duration);
+  const daysDuration = dayjs.duration(duration).days();
+  const hoursDuration = dayjs.duration(duration).hours();
+  const minutesDuration = dayjs.duration(duration).minutes();
 
-  const days = daysDuration.days() === 0 ? '' : daysDuration.days() + 'D ';
-  const hours = hoursDuration.hours() === 0 ? '' : hoursDuration.hours() + 'H ';
-  const minutes = minutesDuration.minutes() === 0 ? '' : minutesDuration.minutes() + 'M';
+  const days = daysDuration === 0 ? '' : String(daysDuration).padStart(2, '0') + 'D ';
+  const hours = (hoursDuration === 0 && daysDuration === 0)? '' : String(hoursDuration).padStart(2, '0') + 'H ';
+  const minutes = String(minutesDuration).padStart(2, '0') + 'M';
 
   return `${days} ${hours} ${minutes}`;
-
 };
 
 export const areDatesEqual = (dateA, dateB) => {

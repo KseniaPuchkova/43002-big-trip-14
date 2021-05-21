@@ -5,38 +5,33 @@ export const RenderPosition = {
   BEFOREEND: 'beforeend',
 };
 
-export const render = function (container, child, position) {
+export const render = (container, element, place) => {
   if (container instanceof Abstract) {
     container = container.getElement();
   }
 
-  if (child instanceof Abstract) {
-    child = child.getElement();
+  if (element instanceof Abstract) {
+    element = element.getElement();
   }
 
-  switch (position) {
+  switch (place) {
     case RenderPosition.AFTERBEGIN:
-      container.prepend(child);
+      container.prepend(element);
       break;
-
     case RenderPosition.BEFOREEND:
-      container.append(child);
+      container.append(element);
       break;
   }
 };
 
-export const renderTemplate = function(container, template, place) {
-  container.insertAdjacentHTML(place, template);
-};
-
-export const createElement = function(template) {
+export const createElement = (template) => {
   const newElement = document.createElement('div');
   newElement.innerHTML = template;
 
   return newElement.firstChild;
 };
 
-export const replace = function(newChild, oldChild) {
+export const replace = (newChild, oldChild) => {
   if (oldChild instanceof Abstract) {
     oldChild = oldChild.getElement();
   }

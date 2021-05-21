@@ -5,15 +5,17 @@ import {Transfer} from '../utils/const.js';
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
     return offers
-      .map(({title, price}) => {
-        return (
-          `<li class="event__offer">
-            <span class="event__offer-title">${title}</span>
-            &plus;&euro;&nbsp;<span class="event__offer-price">${price}</span>
-          </li>`
-        );
-      })
-      .join('\n');
+      .map(({title, price, isChecked}) => {
+        if (isChecked) {
+          return (
+            `<li class="event__offer">
+              <span class="event__offer-title">${title}</span>
+              &plus;&euro;&nbsp;
+              <span class="event__offer-price">${price}</span>
+            </li>`
+          );
+        }
+      }).join('');
   }
   return '';
 };
@@ -21,7 +23,6 @@ const generateOffersMarkup = (offers) => {
 const createPointTemplate = (data = {}) => {
   const {start, end, destination, price, type, offers, isFavorite} = data;
   const offersList = generateOffersMarkup(offers);
-  const preposition = Object.values(Transfer).includes(type) ? 'to' : 'in';
 
   return (
     `<li class="trip-events__item">
@@ -30,7 +31,7 @@ const createPointTemplate = (data = {}) => {
          <div class="event__type">
            <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
          </div>
-         <h3 class="event__title">${type} ${preposition} ${destination.name}</h3>
+         <h3 class="event__title">${type} ${destination.name}</h3>
          <div class="event__schedule">
            <p class="event__time">
              <time class="event__start-time" datetime="${formatUTCDate(start)}">${formatTime(start)}</time>
@@ -68,27 +69,26 @@ export default class Point extends AbstractView {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
-  _buttonOpenClickHandler() {
-    this._callback.click();
-  }
-
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.pointFavoriteClick();
-  }
-
   getTemplate() {
     return createPointTemplate(this._data);
   }
 
   setButtonOpenClickHandler(callback) {
-    this._callback.click = callback;
+    this._callback.openClick = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._buttonOpenClickHandler);
   }
 
   setFavoriteClickHandler(callback) {
-    this._callback.pointFavoriteClick = callback;
+    this._callback.favoriteClick = callback;
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
+  }
+
+  _buttonOpenClickHandler() {
+    this._callback.openClick();
+  }
+
+  _favoriteClickHandler() {
+    this._callback.favoriteClick();
   }
 }
 
