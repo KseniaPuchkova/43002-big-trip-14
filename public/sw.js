@@ -1,4 +1,4 @@
-const CACHE_PREFIX = 'bigtrip-cache';
+const CACHE_PREFIX = 'big-trip-cache';
 const CACHE_VER = 'v14';
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VER}`;
 
@@ -32,11 +32,6 @@ self.addEventListener('install', (evt) => {
           '/img/icons/taxi.png',
           '/img/icons/train.png',
           '/img/icons/transport.png',
-          '/img/photos/1.jpg',
-          '/img/photos/2.jpg',
-          '/img/photos/3.jpg',
-          '/img/photos/4.jpg',
-          '/img/photos/5.jpg',
         ]);
       }),
   );

@@ -40,6 +40,7 @@ export const formatDiffDate = (start, end) => {
   return `${days} ${hours} ${minutes}`;
 };
 
+
 export const formatDuration = (duration) => {
   const daysDuration = dayjs.duration(duration).days();
   const hoursDuration = dayjs.duration(duration).hours();

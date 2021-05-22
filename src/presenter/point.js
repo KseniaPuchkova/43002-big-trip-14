@@ -146,6 +146,8 @@ export default class Point {
   _handleButtonDeleteClick(point) {
     if (!isOnline()) {
       toast('You can\'t delete point offline');
+      this.setViewState(State.DELETING);
+      this.setViewState(State.ABORTING);
       return;
     }
 
@@ -169,6 +171,8 @@ export default class Point {
   _handleFormSubmit(update) {
     if (!isOnline()) {
       toast('You can\'t save point offline');
+      this.setViewState(State.SAVING);
+      this.setViewState(State.ABORTING);
       return;
     }
 

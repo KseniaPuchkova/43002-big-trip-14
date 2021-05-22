@@ -174,7 +174,7 @@ const createEditPointTemplate = (data = {}, destinations) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''} required>
+            <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''} required>
         </div>
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabled ? 'disabled' : ''}>
           ${isSaving ? 'Saving...' : 'Save'}
@@ -244,9 +244,9 @@ export default class EditPoint extends SmartView {
     this.setButtonCloseClickHandler(this._callback.closeClick);
     this.setButtonDeleteClickHandler(this._callback.deleteClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
-    this._setInnerHandlers();
     this._setStartDatepicker();
     this._setEndDatepicker();
+    this._setInnerHandlers();
   }
 
   reset(point) {
