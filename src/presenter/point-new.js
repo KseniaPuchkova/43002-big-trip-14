@@ -1,3 +1,4 @@
+import EditPointView  from '../view/edit-point.js';
 import {BLANK_POINT, RenderPosition, UserAction, UpdateType} from '../utils/const.js';
 import {isOnline} from '../utils/common.js';
 import {render, remove} from '../utils/render.js';
@@ -27,6 +28,7 @@ export default class PointNew {
     this._destinations = this._destinationsModel.get();
     this._offers = this._offersModel.get();
 
+    this._editPointComponent = new EditPointView(this._point, this._destinations, this._offers);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 

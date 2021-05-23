@@ -352,7 +352,7 @@ export default class EditPoint extends SmartView {
     const destination = this._destinations.find((destination) => destination.name === currentDestination);
 
     if (!destination || !currentDestination) {
-      errorMessage(this.getElement().querySelector('.event__header'), 'Please select the city from the list');
+      errorMessage(this.getElement().querySelector('.event__header'), 'Please, select the city from the list');
       return;
     } else {
       evt.target.setCustomValidity('');
@@ -416,7 +416,7 @@ export default class EditPoint extends SmartView {
 
     evt.preventDefault();
     if (Number.isNaN(parseInt(evt.target.value, 10)) || (parseInt(evt.target.value, 10) <= 0) || evt.target.value.length === 0) {
-      errorMessage(this.getElement().querySelector('.event__header'), 'Please input some positive number');
+      errorMessage(this.getElement().querySelector('.event__header'), 'Please, input some positive number');
       return;
     } else {
       evt.target.setCustomValidity('');

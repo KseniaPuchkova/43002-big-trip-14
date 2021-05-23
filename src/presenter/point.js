@@ -99,7 +99,6 @@ export default class Point {
   destroy() {
     remove(this._pointComponent);
     remove(this._editPointComponent);
-    remove(this._parentContainer);
   }
 
   _replacePointToEdit() {
@@ -137,8 +136,6 @@ export default class Point {
       UserAction.RESET_POINT,
       UpdateType.PATCH,
       this._point);
-    //this._editPointComponent.reset(this._point);
-    //document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleButtonDeleteClick(point) {
@@ -197,8 +194,6 @@ export default class Point {
         UserAction.RESET_POINT,
         UpdateType.PATCH,
         this._point);
-      //this._editPointComponent.reset(this._point);
-      //document.removeEventListener('keydown', this._escKeyDownHandler);
     }
   }
 }

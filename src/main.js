@@ -98,7 +98,6 @@ Promise
   });
 
 tripPresenter.init();
-filterPresenter.init();
 
 window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');

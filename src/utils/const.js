@@ -2,7 +2,7 @@ import {addDays} from '../utils/date.js';
 
 const STORE_PREFIX = 'big-trip-localstorage';
 const STORE_VER = 'v14';
-export const AUTHORIZATION = 'Basic 7RUkyeQDQt6JBhJZOo42a';
+export const AUTHORIZATION = 'Basic 7RUkyeQDQt6JBhJZOo17a';
 export const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
 
 export const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
