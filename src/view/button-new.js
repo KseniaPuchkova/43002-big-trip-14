@@ -1,4 +1,4 @@
-import Abstract from './abstract.js';
+import AbstractView from './abstract.js';
 
 const createButtonNewTemplate = () => {
   return (
@@ -8,7 +8,7 @@ const createButtonNewTemplate = () => {
   );
 };
 
-export default class ButtonNew extends Abstract {
+export default class ButtonNew extends AbstractView {
   constructor() {
     super();
     this._buttonClickHandler = this._buttonClickHandler.bind(this);

@@ -15,10 +15,6 @@ export default class Offers extends Observer {
     return this._offers;
   }
 
-  getByType(type) {
-    return this._offers.find((offer) => offer.type === type).offers;
-  }
-
   static adaptToClient(offers) {
     const adaptedOffers = [];
 

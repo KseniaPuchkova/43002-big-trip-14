@@ -1,4 +1,4 @@
-import Abstract from './abstract.js';
+import AbstractView from './abstract.js';
 
 const createLoadingTemplate = () => {
   return (
@@ -6,7 +6,7 @@ const createLoadingTemplate = () => {
   );
 };
 
-export default class Loading extends Abstract {
+export default class Loading extends AbstractView {
   getTemplate() {
     return createLoadingTemplate();
   }

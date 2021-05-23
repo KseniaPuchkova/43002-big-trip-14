@@ -1,21 +1,19 @@
 import AbstractView from './abstract.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
-import {Transfer} from '../utils/const.js';
 
 const generateOffersMarkup = (offers) => {
   if (offers.length) {
     return offers
-      .map(({title, price, isChecked}) => {
-        if (isChecked) {
-          return (
-            `<li class="event__offer">
-              <span class="event__offer-title">${title}</span>
-              &plus;&euro;&nbsp;
-              <span class="event__offer-price">${price}</span>
-            </li>`
-          );
-        }
-      }).join('');
+      .map(({title, price}) => {
+        return (
+          `<li class="event__offer">
+            <span class="event__offer-title">${title}</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">${price}</span>
+          </li>`
+        );
+      })
+      .join('');
   }
   return '';
 };
@@ -83,11 +81,13 @@ export default class Point extends AbstractView {
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
   }
 
-  _buttonOpenClickHandler() {
+  _buttonOpenClickHandler(evt) {
+    evt.preventDefault();
     this._callback.openClick();
   }
 
-  _favoriteClickHandler() {
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
     this._callback.favoriteClick();
   }
 }

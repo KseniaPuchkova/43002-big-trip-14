@@ -30,6 +30,14 @@ export const formatMonthDay = (date) => {
   return dayjs(date).format('MMM DD');
 };
 
+export const formatMonth = (date) => {
+  return dayjs(date).format('MMM');
+};
+
+export const formatDay = (date) => {
+  return dayjs(date).format('DD');
+};
+
 export const formatDiffDate = (start, end) => {
   const diffDate = dayjs.duration((dayjs(end).diff(dayjs(start))));
 

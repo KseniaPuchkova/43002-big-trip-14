@@ -3,7 +3,9 @@ import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
 import {Transfer, Activity} from '../utils/const.js';
-import {BLANK_POINT} from '../utils/point.js';
+import {isOnline} from '../utils/common.js';
+import {toast, error} from '../utils/toast.js';
+import {BLANK_POINT} from '../utils/const.js';
 import {formatValueDate} from '../utils/date.js';
 
 const createDestinationsMarkup = (destinations) => {
@@ -23,9 +25,7 @@ const createPhotosMarkup = (photos) => {
   if (!photos.length) {
     return '';
   }
-
   const photosList = photos.map((photo) => createPhotosListMarkup(photo)).join('\n');
-
   return (
     `<div class="event__photos-container">
       <div class="event__photos-tape">
@@ -39,7 +39,6 @@ const createDescriptionMarkup = (description) => {
   if (!description.length) {
     return '';
   }
-
   return (
     `<p class="event__destination-description">${description}</p>`
   );
@@ -47,7 +46,6 @@ const createDescriptionMarkup = (description) => {
 
 const generateDestinationMarkup = (destination) => {
   const {description, photos} = destination;
-
   if (!description.length && !photos.length) {
     return '';
   }
@@ -74,29 +72,28 @@ const createTypesMarkup = (activeType, types, isDisabled) => {
     .join('\n');
 };
 
-const createOfferListMarkup = (offers, isDisabled) => {
-  return offers
-    .map(({title, price, isChecked}, index) => {
-      return (
-        `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-name-${index}" type="checkbox" name="event-offer-name" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
-        <label class="event__offer-label" for="event-offer-${title.toLowerCase()}" data-title="${title}">
-          <span class="event__offer-title">${title}</span>
-          +
-          €&nbsp;<span class="event__offer-price">${price}</span>
-        </label>
-       </div>`
-      );
-    })
+const createOfferListMarkup = (availableOffersByType, offers, isDisabled) => {
+  return availableOffersByType.map(({title, price}, index) => {
+    const isChecked =  offers ? offers.some((offer) => offer.title === title && offer.price === price) : false;
+    return (
+      `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-name-${index}" type="checkbox" name="event-offer-name" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
+      <label class="event__offer-label" for="event-offer-${title.toLowerCase()}-${index}" data-title="${title}">
+        <span class="event__offer-title">${title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${price}</span>
+      </label>
+      </div>`
+    );
+  })
     .join('\n');
 };
 
-const createOffersMarkup = (offers, isDisabled) => {
-  if (!offers.length) {
+const createOffersMarkup = (availableOffersByType, offers, isDisabled) => {
+  if (!availableOffersByType.length) {
     return '';
   }
-  const offersList = createOfferListMarkup(offers, isDisabled);
-
+  const offersList = createOfferListMarkup(availableOffersByType, offers, isDisabled);
   return (
     `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -118,12 +115,14 @@ const createRollUpButton = (isPointNew) => {
   );
 };
 
-const createEditPointTemplate = (data = {}, destinations) => {
-  const {start, end, destination, type, offers, price, isNew, isDisabled, isSaving, isDeleting} = data;
+const createEditPointTemplate = (data = {}, destinations, availableOffers) => {
+  const {start, end, destination, type, price, offers, isNew, isDisabled, isSaving, isDeleting} = data;
+
   const destinationNames = destinations.map((destination) => destination.name);
   const destinationsList = createDestinationsMarkup(destinationNames);
   const destinationMarkup = generateDestinationMarkup(destination);
-  const offersListContainer = createOffersMarkup(offers, isDisabled);
+  const availableOffersByType = availableOffers.find((offer) => offer.type === type).offers;
+  const offersListContainer = createOffersMarkup(availableOffersByType, offers, isDisabled);
   const transfersList = createTypesMarkup(type, Object.values(Transfer));
   const activitiesList = createTypesMarkup(type, Object.values(Activity));
   const rollUpButton = createRollUpButton(isNew);
@@ -153,7 +152,8 @@ const createEditPointTemplate = (data = {}, destinations) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''} autocomplete="on" required>
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}
+               autocomplete="off" required oninvalid="this.setCustomValidity('Please select the city from the list')">
             <datalist id="destination-list-1">
               ${destinationsList}
             </datalist>
@@ -174,7 +174,8 @@ const createEditPointTemplate = (data = {}, destinations) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="number" min="1" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''} required>
+            <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price ? he.encode(String(price)) : ''}" ${isDisabled ? 'disabled' : ''}
+              required oninvalid="this.setCustomValidity('Please input some positive number')">
         </div>
           <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled || isDisabled ? 'disabled' : ''}>
           ${isSaving ? 'Saving...' : 'Save'}
@@ -199,7 +200,8 @@ export default class EditPoint extends SmartView {
     this._data = data;
     this._stateData = EditPoint.parseDataToState(this._data);
     this._destinations = destinations;
-    this._offers = offers;
+    this._availableOffers = offers;
+    this._availableOffersByType = this._availableOffers.find((offer) => offer.type === this._stateData.type).offers;
     this._startDatepicker = null;
     this._endDatepicker = null;
     this._currentUserDate = null;
@@ -220,7 +222,7 @@ export default class EditPoint extends SmartView {
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._stateData, this._destinations, this._offers);
+    return createEditPointTemplate(this._stateData, this._destinations, this._availableOffers);
   }
 
   setButtonCloseClickHandler(callback) {
@@ -272,19 +274,16 @@ export default class EditPoint extends SmartView {
       this._startDatepicker = null;
     }
 
-    this._startDatepicker = flatpickr(
-      this.getElement().querySelector('#event-start-time-1'),
-      {
-        'mode': 'single',
-        'enableTime': true,
-        'altInput': true,
-        'time_24hr': true,
-        'dateFormat': 'd/m/y H:i',
-        'altFormat': 'd/m/y H:i',
-        'defaultDate': this._stateData.start,
-        'onChange': this._startDateChangeHandler,
-      },
-    );
+    this._startDatepicker = flatpickr(this.getElement().querySelector('#event-start-time-1'), {
+      'mode': 'single',
+      'enableTime': true,
+      'altInput': true,
+      'time_24hr': true,
+      'dateFormat': 'd/m/y H:i',
+      'altFormat': 'd/m/y H:i',
+      'defaultDate': this._stateData.start,
+      'onChange': this._startDateChangeHandler,
+    });
   }
 
   _setEndDatepicker() {
@@ -293,23 +292,25 @@ export default class EditPoint extends SmartView {
       this._endDatepicker = null;
     }
 
-    this._endDatepicker = flatpickr(
-      this.getElement().querySelector('#event-end-time-1'),
-      {
-        'mode': 'single',
-        'enableTime': true,
-        'altInput': true,
-        'time_24hr': true,
-        'dateFormat': 'd/m/y H:i',
-        'altFormat': 'd/m/y H:i',
-        'defaultDate': this._stateData.end,
-        'minDate': this._stateData.start,
-        'onChange': this._endDateChangeHandler,
-      },
-    );
+    this._endDatepicker = flatpickr(this.getElement().querySelector('#event-end-time-1'),{
+      'mode': 'single',
+      'enableTime': true,
+      'altInput': true,
+      'time_24hr': true,
+      'dateFormat': 'd/m/y H:i',
+      'altFormat': 'd/m/y H:i',
+      'defaultDate': this._stateData.end,
+      'minDate': this._stateData.start,
+      'onChange': this._endDateChangeHandler,
+    });
   }
 
   _startDateChangeHandler([userDate]) {
+    if (!isOnline()) {
+      toast('You can\'t change date offline');
+      return;
+    }
+
     this._currentUserDate = userDate;
     this._endDatepicker.set('minDate', userDate);
     this._endDatepicker.set('minTime', userDate);
@@ -317,7 +318,10 @@ export default class EditPoint extends SmartView {
     if (this._currentUserDate <= userDate && this._stateData.end <= userDate) {
       this._endDatepicker.setDate(userDate);
       this._startDatepicker.setDate(userDate);
+
+      this._stateData.end = this._currentUserDate;
       this._currentUserDate = userDate;
+      error(this.getElement().querySelector('.event__header'), 'The end date must not be earlier than the start date');
     }
 
     this.updateState({
@@ -326,6 +330,11 @@ export default class EditPoint extends SmartView {
   }
 
   _endDateChangeHandler([userDate]) {
+    if (!isOnline()) {
+      toast('You can\'t change date offline');
+      return;
+    }
+
     this._startDatepicker.set('maxDate', userDate);
 
     this.updateState({
@@ -334,12 +343,17 @@ export default class EditPoint extends SmartView {
   }
 
   _destinationChangeHandler(evt) {
+    if (!isOnline()) {
+      toast('You can\'t change destination offline');
+      return;
+    }
+
     evt.preventDefault();
     const currentDestination = evt.target.value;
     const destination = this._destinations.find((destination) => destination.name === currentDestination);
 
     if (!destination || !currentDestination) {
-      evt.target.setCustomValidity('Please select the city from the list');
+      error(this.getElement().querySelector('.event__header'), 'Please select the city from the list');
       return;
     } else {
       evt.target.setCustomValidity('');
@@ -350,41 +364,60 @@ export default class EditPoint extends SmartView {
   }
 
   _typeChangeHandler(evt) {
+    if (!isOnline()) {
+      toast('You can\'t change type offline');
+      return;
+    }
+
     evt.preventDefault();
     if (!evt.target.classList.contains('event__type-label')) {
       return;
     }
 
     const type = evt.target.textContent;
-    const offers = this._offers.find((offer) => offer.type === type).offers;
+    this._availableOffersByType = this._availableOffers.find((offer) => offer.type === type).offers;
 
-    if (offers) {
+    if (this._availableOffersByType) {
       this.updateState({
         type,
-        offers,
+        availableOffersByType: this._availableOffersByType,
+        offers: [],
       }, false);
     }
   }
 
   _offersChangeHandler(evt) {
+    if (!isOnline()) {
+      toast('You can\'t select offers offline');
+      return;
+    }
+
     evt.preventDefault();
-    const title = evt.target.closest('label').dataset.title;
-    const index = this._stateData.offers.findIndex((offer) => offer.title === title);
-    const offers = this._stateData.offers.slice();
+    const target = evt.target.closest('label');
+    if (!target) {
+      return;
+    }
+
+    const title = target.dataset.title;
+    const currentOffers = this._stateData.offers;
+    const checkedAvailableOffer = this._availableOffersByType.find((offer) => offer.title === title);
+    const checkedCurrentOffer = currentOffers.find((offer) => offer.title === title);
+    const checkedOffers = checkedCurrentOffer ? currentOffers.filter((offer) => offer.title !== title) : [...currentOffers, checkedAvailableOffer];
 
     this.updateState({
-      offers: Object.assign(
-        [],
-        offers,
-        offers[index].isChecked = !offers[index].isChecked,
-      ),
-    }, false);
+      offers: checkedOffers,
+    });
   }
 
   _priceInputHandler(evt) {
+    if (!isOnline()) {
+      toast('You can\'t put price offline');
+      return;
+    }
+
     evt.preventDefault();
     if (Number.isNaN(parseInt(evt.target.value, 10)) || (parseInt(evt.target.value, 10) <= 0) || evt.target.value.length === 0) {
-      evt.target.setCustomValidity('Please input some positive number');
+      error(this.getElement().querySelector('.event__header'), 'Please input some positive number');
       return;
     } else {
       evt.target.setCustomValidity('');
@@ -394,7 +427,8 @@ export default class EditPoint extends SmartView {
     }
   }
 
-  _buttonCloseClickHandler() {
+  _buttonCloseClickHandler(evt) {
+    evt.preventDefault();
     this._callback.closeClick();
   }
 
@@ -409,11 +443,9 @@ export default class EditPoint extends SmartView {
   }
 
   _setInnerHandlers() {
-    if (this._stateData.offers.length) {
-      this.getElement().querySelectorAll('.event__offer-selector').forEach((offer) =>
-        offer.addEventListener('click', this._offersChangeHandler));
+    if (this._stateData.offers.length || this._availableOffersByType.length) {
+      this.getElement().querySelector('.event__available-offers').addEventListener('click', this._offersChangeHandler);
     }
-
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._destinationChangeHandler);
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._typeChangeHandler);

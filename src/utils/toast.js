@@ -4,7 +4,7 @@ const toastContainer = document.createElement('div');
 toastContainer.classList.add('toast-container');
 document.body.prepend(toastContainer);
 
-const toast = (message) => {
+export const toast = (message) => {
   const toastItem = document.createElement('div');
   toastItem.textContent = message;
   toastItem.classList.add('toast-item');
@@ -16,4 +16,16 @@ const toast = (message) => {
   }, SHOW_TIME);
 };
 
-export {toast};
+export const error = (parent, message) => {
+  const errorMessage = document.createElement('div');
+  errorMessage.textContent = message;
+  errorMessage.classList.add('error-item');
+
+  parent.style.position = 'relative';
+  parent.appendChild(errorMessage);
+
+  setTimeout(() => {
+    errorMessage.remove();
+  }, SHOW_TIME);
+};
+

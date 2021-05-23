@@ -35,7 +35,7 @@ export default class Api {
   getOffers() {
     return this._load({url: 'offers'})
       .then(Api.toJSON)
-      .then((destinations) => destinations.map(OffersModel.adaptToClient));
+      .then((offers) => offers.map(OffersModel.adaptToClient));
   }
 
   updatePoint(point) {

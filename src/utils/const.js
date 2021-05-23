@@ -1,3 +1,20 @@
+import {addDays} from '../utils/date.js';
+
+export const BLANK_POINT = {
+  isNew: true,
+  start: new Date(),
+  end: new Date(addDays(new Date())),
+  type: 'taxi',
+  price: '',
+  offers: [],
+  isFavorite: false,
+  destination: {
+    name: '',
+    description: '',
+    photos: [],
+  },
+};
+
 export const Transfer = {
   TAXI: 'taxi',
   BUS: 'bus',
@@ -50,4 +67,15 @@ export const ChartName = {
   MONEY: 'money',
   TYPE: 'type',
   TIMESPEND: 'time-spend',
+};
+
+export const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
 };

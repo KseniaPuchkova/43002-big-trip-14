@@ -2,20 +2,10 @@ import EditPointView  from '../view/edit-point.js';
 import PointView  from '../view/point.js';
 import {isOnline} from '../utils/common.js';
 import {toast} from '../utils/toast.js';
-import {UserAction, UpdateType} from '../utils/const.js';
+import {UserAction, UpdateType, Mode, State} from '../utils/const.js';
 import {areDatesEqual} from '../utils/date.js';
 import {RenderPosition, render, replace, remove} from '../utils/render.js';
 
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
-
-export const State = {
-  SAVING: 'SAVING',
-  DELETING: 'DELETING',
-  ABORTING: 'ABORTING',
-};
 export default class Point {
   constructor(pointContainer, changeData, changeMode, destinationsModel, offersModel) {
     this._pointContainer = pointContainer;
@@ -48,9 +38,9 @@ export default class Point {
     this._editPointComponent = new EditPointView(point, this._destinations, this._offers);
 
     this._pointComponent.setButtonOpenClickHandler(this._handleButtonOpenClick);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._editPointComponent.setButtonCloseClickHandler(this._handleButtonCloseClick);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
@@ -131,34 +121,40 @@ export default class Point {
     }
 
     this._replacePointToEdit();
-    this._editPointComponent.reset(this._point);
   }
 
   _handleButtonCloseClick() {
     if (!isOnline()) {
-      toast('You can\'t edit point offline');
+      toast('You can\'t open o close point offline');
+      this.setViewState(State.ABORTING);
       return;
     }
 
+    this._editPointComponent.reset(this._point);
     this._replaceEditToPoint();
   }
 
   _handleButtonDeleteClick(point) {
     if (!isOnline()) {
       toast('You can\'t delete point offline');
-      this.setViewState(State.DELETING);
       this.setViewState(State.ABORTING);
       return;
     }
 
     this._changeData(
       UserAction.DELETE_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,
       point,
     );
   }
 
   _handleFavoriteClick() {
+    if (!isOnline()) {
+      toast('You can\'t edit point offline');
+      this.setViewState(State.ABORTING);
+      return;
+    }
+
     this._changeData(
       UserAction.UPDATE_POINT,
       UpdateType.PATCH,
@@ -171,7 +167,6 @@ export default class Point {
   _handleFormSubmit(update) {
     if (!isOnline()) {
       toast('You can\'t save point offline');
-      this.setViewState(State.SAVING);
       this.setViewState(State.ABORTING);
       return;
     }

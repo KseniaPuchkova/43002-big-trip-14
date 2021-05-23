@@ -56,19 +56,6 @@ export default class Points extends Observer {
   }
 
   static adaptToClient(point) {
-    const adaptedOffers = [];
-
-    for (let i = 0; i < point.offers.length; i++) {
-      adaptedOffers.push(Object.assign(
-        {},
-        point.offers[i],
-        {
-          isChecked: point.offers[i].isChecked,
-        },
-      ));
-    }
-
-
     const adaptedPoint = Object.assign({},
       point,
       {
@@ -83,7 +70,6 @@ export default class Points extends Observer {
             photos: point.destination.pictures,
           },
         ),
-        offers: adaptedOffers,
       });
 
     delete adaptedPoint.date_from;
@@ -91,24 +77,10 @@ export default class Points extends Observer {
     delete adaptedPoint.base_price;
     delete adaptedPoint.is_favorite;
     delete adaptedPoint.destination.pictures;
-    delete adaptedPoint.offers.isChecked;
-
     return adaptedPoint;
   }
 
   static adaptToServer(point) {
-    const adaptedOffers = [];
-
-    for (let i = 0; i < point.offers.length; i++) {
-      adaptedOffers.push(Object.assign(
-        {},
-        point.offers[i],
-        {
-          isChecked: point.offers[i].isChecked,
-        },
-      ));
-    }
-
     const adaptedPoint = Object.assign(
       {},
       point,
@@ -116,7 +88,7 @@ export default class Points extends Observer {
         'date_from': point.start.toISOString(),
         'date_to': point.end.toISOString(),
         'base_price': point.price ? point.price : null,
-        'is_favorite': point.isFavorite,
+        'is_favorite': point.isFavorite ? point.isFavorite : false,
         destination: Object.assign(
           {},
           point.destination,
@@ -124,7 +96,6 @@ export default class Points extends Observer {
             pictures: point.destination.photos,
           },
         ),
-        offers: adaptedOffers,
       },
     );
 
@@ -133,7 +104,6 @@ export default class Points extends Observer {
     delete adaptedPoint.price;
     delete adaptedPoint.destination.photos;
     delete adaptedPoint.isFavorite;
-    delete adaptedPoint.offers.isChecked;
     delete adaptedPoint.isNew;
 
     return adaptedPoint;

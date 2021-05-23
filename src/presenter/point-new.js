@@ -1,6 +1,8 @@
 import EditPointView  from '../view/edit-point.js';
+import {isOnline} from '../utils/common.js';
 import {UserAction, UpdateType} from '../utils/const.js';
-import {BLANK_POINT} from '../utils/point.js';
+import {toast} from '../utils/toast.js';
+import {BLANK_POINT} from '../utils/const.js';
 import {RenderPosition, render, remove} from '../utils/render.js';
 
 export default class PointNew {
@@ -24,7 +26,6 @@ export default class PointNew {
     }
 
     this._point = BLANK_POINT;
-    BLANK_POINT.offers = this._offersModel.getByType(BLANK_POINT.type);
     this._destinations = this._destinationsModel.get();
     this._offers = this._offersModel.get();
 
@@ -72,6 +73,11 @@ export default class PointNew {
   }
 
   _handleFormSubmit(point) {
+    if (!isOnline()) {
+      toast('You can\'t add new point offline');
+      return;
+    }
+
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
@@ -82,6 +88,10 @@ export default class PointNew {
   }
 
   _handleButtonDeleteClick() {
+    if (!isOnline()) {
+      toast('You can\'t cancel point offline');
+      return;
+    }
     this.destroy();
   }
 
