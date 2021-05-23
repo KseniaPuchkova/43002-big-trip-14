@@ -1,3 +1,4 @@
+import PointItemView  from '../view/point-item.js';
 import EditPointView  from '../view/edit-point.js';
 import PointView  from '../view/point.js';
 import {isOnline} from '../utils/common.js';
@@ -17,6 +18,7 @@ export default class Point {
     this._pointComponent = null;
     this._editPointComponent = null;
     this._mode = Mode.DEFAULT;
+    this._parentContainer = new PointItemView();
 
     this._handleButtonOpenClick = this._handleButtonOpenClick.bind(this);
     this._handleButtonCloseClick = this._handleButtonCloseClick.bind(this);
@@ -44,7 +46,10 @@ export default class Point {
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
-      render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
+      //render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
+
+      render(this._pointContainer, this._parentContainer, RenderPosition.BEFOREEND);
+      render(this._parentContainer, this._pointComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -99,6 +104,7 @@ export default class Point {
   destroy() {
     remove(this._pointComponent);
     remove(this._editPointComponent);
+    remove(this._parentContainer);
   }
 
   _replacePointToEdit() {
