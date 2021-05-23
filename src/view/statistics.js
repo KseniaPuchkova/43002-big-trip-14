@@ -1,9 +1,9 @@
 import SmartView from './smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {BAR_HEIGHT, ChartName} from '../utils/const.js';
 import {formatDuration} from '../utils/date.js';
-import {BAR_HEIGHT, getTypesUnique, getMoneySpend, getTypesCount, getTimeSpend} from '../utils/statistics.js';
-import {ChartName} from '../utils/const.js';
+import {getTypesUnique, getMoneySpend, getTypesCount, getTimeSpend} from '../utils/statistics.js';
 
 const renderChart = (nameCtx, titles, data, types, dataFormat) => {
   return new Chart(nameCtx, {

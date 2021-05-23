@@ -6,9 +6,9 @@ import PointsListView  from '../view/points-list.js';
 import NoPointsView  from '../view/no-points.js';
 import PointPresenter from './point.js';
 import PointNewPresenter from './point-new.js';
-import {RenderPosition, render, remove, showContainerlineElement, hideContainerlineElement} from '../utils/render.js';
+import {RenderPosition, SortType, FilterType, UpdateType, UserAction, State} from '../utils/const.js';
+import {render, remove, showContainerlineElement, hideContainerlineElement} from '../utils/render.js';
 import {getSortedItems, getTotalPrice} from '../utils/point.js';
-import {SortType, FilterType, UpdateType, UserAction, State} from '../utils/const.js';
 import {filter} from '../utils/filter.js';
 
 export default class Trip {
@@ -243,6 +243,9 @@ export default class Trip {
           .catch(() => {
             this._pointPresenters[update.id].setViewState(State.ABORTING);
           });
+        break;
+      case UserAction.RESET_POINT:
+        this._pointPresenters[update.id].init(update);
         break;
     }
   }

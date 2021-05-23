@@ -1,11 +1,10 @@
-import PointItemView  from '../view/point-item.js';
 import EditPointView  from '../view/edit-point.js';
 import PointView  from '../view/point.js';
-import {isOnline} from '../utils/common.js';
-import {toast} from '../utils/toast.js';
-import {UserAction, UpdateType, Mode, State} from '../utils/const.js';
+import {RenderPosition, UserAction, UpdateType, Mode, State} from '../utils/const.js';
 import {areDatesEqual} from '../utils/date.js';
-import {RenderPosition, render, replace, remove} from '../utils/render.js';
+import {render, replace, remove} from '../utils/render.js';
+import {isOnline} from '../utils/common.js';
+import {toastMessage} from '../utils/message.js';
 
 export default class Point {
   constructor(pointContainer, changeData, changeMode, destinationsModel, offersModel) {
@@ -18,7 +17,6 @@ export default class Point {
     this._pointComponent = null;
     this._editPointComponent = null;
     this._mode = Mode.DEFAULT;
-    this._parentContainer = new PointItemView();
 
     this._handleButtonOpenClick = this._handleButtonOpenClick.bind(this);
     this._handleButtonCloseClick = this._handleButtonCloseClick.bind(this);
@@ -46,10 +44,7 @@ export default class Point {
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if (prevPointComponent === null || prevEditPointComponent === null) {
-      //render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
-
-      render(this._pointContainer, this._parentContainer, RenderPosition.BEFOREEND);
-      render(this._parentContainer, this._pointComponent, RenderPosition.BEFOREEND);
+      render(this._pointContainer, this._pointComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -122,27 +117,33 @@ export default class Point {
 
   _handleButtonOpenClick() {
     if (!isOnline()) {
-      toast('You can\'t edit point offline');
+      toastMessage('You can\'t edit point offline');
       return;
     }
 
     this._replacePointToEdit();
+    document.addEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleButtonCloseClick() {
     if (!isOnline()) {
-      toast('You can\'t open o close point offline');
+      toastMessage('You can\'t open o close point offline');
       this.setViewState(State.ABORTING);
       return;
     }
 
-    this._editPointComponent.reset(this._point);
     this._replaceEditToPoint();
+    this._changeData(
+      UserAction.RESET_POINT,
+      UpdateType.PATCH,
+      this._point);
+    //this._editPointComponent.reset(this._point);
+    //document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleButtonDeleteClick(point) {
     if (!isOnline()) {
-      toast('You can\'t delete point offline');
+      toastMessage('You can\'t delete point offline');
       this.setViewState(State.ABORTING);
       return;
     }
@@ -152,11 +153,12 @@ export default class Point {
       UpdateType.MAJOR,
       point,
     );
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _handleFavoriteClick() {
     if (!isOnline()) {
-      toast('You can\'t edit point offline');
+      toastMessage('You can\'t edit point offline');
       this.setViewState(State.ABORTING);
       return;
     }
@@ -172,7 +174,7 @@ export default class Point {
 
   _handleFormSubmit(update) {
     if (!isOnline()) {
-      toast('You can\'t save point offline');
+      toastMessage('You can\'t save point offline');
       this.setViewState(State.ABORTING);
       return;
     }
@@ -184,14 +186,19 @@ export default class Point {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       update,
     );
+    document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this._editPointComponent.reset(this._point);
       this._replaceEditToPoint();
-      document.removeEventListener('keydown', this._escKeyDownHandler);
+      this._changeData(
+        UserAction.RESET_POINT,
+        UpdateType.PATCH,
+        this._point);
+      //this._editPointComponent.reset(this._point);
+      //document.removeEventListener('keydown', this._escKeyDownHandler);
     }
   }
 }

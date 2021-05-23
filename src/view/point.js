@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import SmartView from './smart.js';
 import {formatUTCDate, formatTime, formatMonthDay, formatDiffDate} from '../utils/date.js';
 
 const generateOffersMarkup = (offers) => {
@@ -23,7 +23,8 @@ const createPointTemplate = (data = {}) => {
   const offersList = generateOffersMarkup(offers);
 
   return (
-    ` <div class="event">
+    `<li class="trip-events__item">
+       <div class="event">
          <time class="event__date" datetime="${formatMonthDay(start)}">${formatMonthDay(start)}</time>
          <div class="event__type">
            <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
@@ -53,11 +54,12 @@ const createPointTemplate = (data = {}) => {
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
-       </div> `
+       </div>
+    </li>`
   );
 };
 
-export default class Point extends AbstractView {
+export default class Point extends SmartView {
   constructor(data) {
     super();
     this._data = data;
@@ -77,6 +79,11 @@ export default class Point extends AbstractView {
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
+  }
+
+  restoreHandlers() {
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setButtonOpenClickHandler(this._callback.openClick);
   }
 
   _buttonOpenClickHandler(evt) {

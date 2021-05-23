@@ -7,19 +7,13 @@ import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import DestinationsModel from './model/destinations.js';
 import OffersModel from './model/offers.js';
+import {AUTHORIZATION, END_POINT, STORE_NAME, RenderPosition, UpdateType, MenuItem} from './utils/const.js';
 import {isOnline} from './utils/common.js';
-import {toast} from './utils/toast.js';
-import {UpdateType, MenuItem} from './utils/const.js';
-import {RenderPosition, render, remove} from './utils/render.js';
+import {render, remove} from './utils/render.js';
+import {toastMessage} from './utils/message.js';
 import Api from './api/api.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
-
-const AUTHORIZATION = 'Basic 7RUkyeQDQt6JBhJZOo42a';
-const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
-const STORE_PREFIX = 'big-trip-localstorage';
-const STORE_VER = 'v14';
-const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
 const pointsStore = new Store(STORE_NAME, window.localStorage);
@@ -44,7 +38,7 @@ buttonNewComponent.addDisabled();
 buttonNewComponent.setButtonClickHandler(() => {
 
   if (!isOnline()) {
-    toast('You can\'t create new point offline');
+    toastMessage('You can\'t create new point offline');
     return;
   }
 
@@ -100,7 +94,7 @@ Promise
     pointsModel.set(UpdateType.INIT, []);
     render(tripControlsNavigationElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-    toast('Something went wrong. Please, reload the page');
+    toastMessage('Something went wrong. Please, reload the page');
   });
 
 tripPresenter.init();
@@ -110,17 +104,17 @@ window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');
   if (!isOnline()) {
     document.title += ' [offline]';
-    toast('Offline mode');
+    toastMessage('Offline mode');
   }
 });
 
 window.addEventListener('online', () => {
-  toast('The connection restored. Online mode');
+  toastMessage('The connection restored. Online mode');
   document.title = document.title.replace(' [offline]', '');
   apiWithProvider.sync();
 });
 
 window.addEventListener('offline', () => {
-  toast('The connection lost. Offline mode');
+  toastMessage('The connection lost. Offline mode');
   document.title += ' [offline]';
 });

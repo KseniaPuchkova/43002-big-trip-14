@@ -2,11 +2,10 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import SmartView from './smart.js';
-import {Transfer, Activity} from '../utils/const.js';
+import {Transfer, Activity, BLANK_POINT} from '../utils/const.js';
 import {isOnline} from '../utils/common.js';
-import {toast, error} from '../utils/toast.js';
-import {BLANK_POINT} from '../utils/const.js';
 import {formatValueDate} from '../utils/date.js';
+import {toastMessage, errorMessage} from '../utils/message.js';
 
 const createDestinationsMarkup = (destinations) => {
   return destinations.map((destination) => {
@@ -128,8 +127,8 @@ const createEditPointTemplate = (data = {}, destinations, availableOffers) => {
   const rollUpButton = createRollUpButton(isNew);
 
   return (
-
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+      <form class="trip-events__item  event  event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -189,7 +188,8 @@ const createEditPointTemplate = (data = {}, destinations, availableOffers) => {
           ${offersListContainer}
           ${destinationMarkup}
         </section>
-      </form>`
+      </form>
+    </li>`
   );
 };
 
@@ -306,7 +306,7 @@ export default class EditPoint extends SmartView {
 
   _startDateChangeHandler([userDate]) {
     if (!isOnline()) {
-      toast('You can\'t change date offline');
+      toastMessage('You can\'t change date offline');
       return;
     }
 
@@ -320,7 +320,7 @@ export default class EditPoint extends SmartView {
 
       this._stateData.end = this._currentUserDate;
       this._currentUserDate = userDate;
-      error(this.getElement().querySelector('.event__header'), 'The end date must not be earlier than the start date');
+      errorMessage(this.getElement().querySelector('.event__header'), 'The end date must not be earlier than the start date');
     }
 
     this.updateState({
@@ -330,7 +330,7 @@ export default class EditPoint extends SmartView {
 
   _endDateChangeHandler([userDate]) {
     if (!isOnline()) {
-      toast('You can\'t change date offline');
+      toastMessage('You can\'t change date offline');
       return;
     }
 
@@ -343,7 +343,7 @@ export default class EditPoint extends SmartView {
 
   _destinationChangeHandler(evt) {
     if (!isOnline()) {
-      toast('You can\'t change destination offline');
+      toastMessage('You can\'t change destination offline');
       return;
     }
 
@@ -352,7 +352,7 @@ export default class EditPoint extends SmartView {
     const destination = this._destinations.find((destination) => destination.name === currentDestination);
 
     if (!destination || !currentDestination) {
-      error(this.getElement().querySelector('.event__header'), 'Please select the city from the list');
+      errorMessage(this.getElement().querySelector('.event__header'), 'Please select the city from the list');
       return;
     } else {
       evt.target.setCustomValidity('');
@@ -364,7 +364,7 @@ export default class EditPoint extends SmartView {
 
   _typeChangeHandler(evt) {
     if (!isOnline()) {
-      toast('You can\'t change type offline');
+      toastMessage('You can\'t change type offline');
       return;
     }
 
@@ -387,7 +387,7 @@ export default class EditPoint extends SmartView {
 
   _offersChangeHandler(evt) {
     if (!isOnline()) {
-      toast('You can\'t select offers offline');
+      toastMessage('You can\'t select offers offline');
       return;
     }
 
@@ -410,13 +410,13 @@ export default class EditPoint extends SmartView {
 
   _priceInputHandler(evt) {
     if (!isOnline()) {
-      toast('You can\'t put price offline');
+      toastMessage('You can\'t put price offline');
       return;
     }
 
     evt.preventDefault();
     if (Number.isNaN(parseInt(evt.target.value, 10)) || (parseInt(evt.target.value, 10) <= 0) || evt.target.value.length === 0) {
-      error(this.getElement().querySelector('.event__header'), 'Please input some positive number');
+      errorMessage(this.getElement().querySelector('.event__header'), 'Please input some positive number');
       return;
     } else {
       evt.target.setCustomValidity('');

@@ -1,7 +1,5 @@
 import dayjs from 'dayjs';
 
-export const BAR_HEIGHT = 55;
-
 export const getTypesUnique = (points) => Array.from(new Set(points.slice().map((point) => point.type.toUpperCase())));
 
 export const getMoneySpend = (points, types) => types.map((type) => {

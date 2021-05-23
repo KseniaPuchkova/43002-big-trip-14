@@ -1,9 +1,7 @@
-import EditPointView  from '../view/edit-point.js';
+import {BLANK_POINT, RenderPosition, UserAction, UpdateType} from '../utils/const.js';
 import {isOnline} from '../utils/common.js';
-import {UserAction, UpdateType} from '../utils/const.js';
-import {toast} from '../utils/toast.js';
-import {BLANK_POINT} from '../utils/const.js';
-import {RenderPosition, render, remove} from '../utils/render.js';
+import {render, remove} from '../utils/render.js';
+import {toastMessage} from '../utils/message.js';
 
 export default class PointNew {
   constructor(pointContainer, buttonNewComponent, changeData, destinationsModel, offersModel) {
@@ -29,7 +27,6 @@ export default class PointNew {
     this._destinations = this._destinationsModel.get();
     this._offers = this._offersModel.get();
 
-    this._editPointComponent = new EditPointView(this._point, this._destinations, this._offers);
     this._editPointComponent.setButtonDeleteClickHandler(this._handleButtonDeleteClick);
     this._editPointComponent.setFormSubmitHandler(this._handleFormSubmit);
 
@@ -74,7 +71,7 @@ export default class PointNew {
 
   _handleFormSubmit(point) {
     if (!isOnline()) {
-      toast('You can\'t add new point offline');
+      toastMessage('You can\'t add new point offline');
       return;
     }
 
@@ -89,7 +86,7 @@ export default class PointNew {
 
   _handleButtonDeleteClick() {
     if (!isOnline()) {
-      toast('You can\'t cancel point offline');
+      toastMessage('You can\'t cancel point offline');
       return;
     }
     this.destroy();
@@ -102,4 +99,3 @@ export default class PointNew {
     }
   }
 }
-

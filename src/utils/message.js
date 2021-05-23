@@ -1,10 +1,10 @@
-const SHOW_TIME = 5000;
+import {SHOW_TIME} from '../utils/const.js';
 
 const toastContainer = document.createElement('div');
 toastContainer.classList.add('toast-container');
 document.body.prepend(toastContainer);
 
-export const toast = (message) => {
+export const toastMessage = (message) => {
   const toastItem = document.createElement('div');
   toastItem.textContent = message;
   toastItem.classList.add('toast-item');
@@ -16,16 +16,15 @@ export const toast = (message) => {
   }, SHOW_TIME);
 };
 
-export const error = (parent, message) => {
-  const errorMessage = document.createElement('div');
-  errorMessage.textContent = message;
-  errorMessage.classList.add('error-item');
+export const errorMessage = (parent, message) => {
+  const errorItem = document.createElement('div');
+  errorItem.textContent = message;
+  errorItem.classList.add('error-item');
 
   parent.style.position = 'relative';
-  parent.appendChild(errorMessage);
+  parent.appendChild(errorItem);
 
   setTimeout(() => {
-    errorMessage.remove();
+    errorItem.remove();
   }, SHOW_TIME);
 };
-

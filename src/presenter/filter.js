@@ -1,7 +1,7 @@
 import FilterView from '../view/filters.js';
-import {render, RenderPosition, replace, remove} from '../utils/render.js';
+import {RenderPosition, FilterType, UpdateType} from '../utils/const.js';
+import {render, replace, remove} from '../utils/render.js';
 import {filter} from '../utils/filter.js';
-import {FilterType, UpdateType} from '../utils/const.js';
 
 export default class Filter {
   constructor(tripControlsFiltersElement, filterModel, pointsModel) {

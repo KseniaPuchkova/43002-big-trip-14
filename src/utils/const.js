@@ -1,5 +1,18 @@
 import {addDays} from '../utils/date.js';
 
+const STORE_PREFIX = 'big-trip-localstorage';
+const STORE_VER = 'v14';
+export const AUTHORIZATION = 'Basic 7RUkyeQDQt6JBhJZOo42a';
+export const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+
+export const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+
+export const SHOW_TIME = 5000;
+
+export const BAR_HEIGHT = 55;
+
 export const BLANK_POINT = {
   isNew: true,
   start: new Date(),
@@ -29,6 +42,11 @@ export const Activity = {
   CHECK_IN: 'check-in',
   SIGHTSEEING: 'sightseeing',
   RESTAURANT: 'restaurant',
+};
+
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
 };
 
 export const MenuItem = {
