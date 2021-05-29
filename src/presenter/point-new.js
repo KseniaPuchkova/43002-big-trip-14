@@ -73,7 +73,8 @@ export default class PointNew {
 
   _handleFormSubmit(point) {
     if (!isOnline()) {
-      toastMessage('You can\'t add new point offline');
+      toastMessage('You can\'t save new point offline');
+      this.setAborting();
       return;
     }
 
@@ -87,10 +88,6 @@ export default class PointNew {
   }
 
   _handleButtonDeleteClick() {
-    if (!isOnline()) {
-      toastMessage('You can\'t cancel point offline');
-      return;
-    }
     this.destroy();
   }
 

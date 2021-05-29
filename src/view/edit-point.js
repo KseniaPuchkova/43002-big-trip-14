@@ -362,13 +362,13 @@ export default class EditPoint extends SmartView {
   }
 
   _typeChangeHandler(evt) {
-    if (!isOnline()) {
-      toastMessage('You can\'t change type offline');
+    evt.preventDefault();
+    if (!evt.target.classList.contains('event__type-label')) {
       return;
     }
 
-    evt.preventDefault();
-    if (!evt.target.classList.contains('event__type-label')) {
+    if (!isOnline()) {
+      toastMessage('You can\'t change type offline');
       return;
     }
 
@@ -385,14 +385,14 @@ export default class EditPoint extends SmartView {
   }
 
   _offersChangeHandler(evt) {
-    if (!isOnline()) {
-      toastMessage('You can\'t select offers offline');
-      return;
-    }
-
     evt.preventDefault();
     const target = evt.target.closest('label');
     if (!target) {
+      return;
+    }
+
+    if (!isOnline()) {
+      toastMessage('You can\'t select offers offline');
       return;
     }
 

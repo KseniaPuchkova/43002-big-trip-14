@@ -117,6 +117,7 @@ export default class Point {
   _handleButtonOpenClick() {
     if (!isOnline()) {
       toastMessage('You can\'t edit point offline');
+      this.setViewState(State.ABORTING);
       return;
     }
 
@@ -125,12 +126,6 @@ export default class Point {
   }
 
   _handleButtonCloseClick() {
-    if (!isOnline()) {
-      toastMessage('You can\'t open o close point offline');
-      this.setViewState(State.ABORTING);
-      return;
-    }
-
     this._replaceEditToPoint();
     this._changeData(
       UserAction.RESET_POINT,
