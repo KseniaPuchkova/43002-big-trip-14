@@ -14,23 +14,4 @@ export default class Offers extends Observer {
   get() {
     return this._offers;
   }
-
-  static adaptToClient(offers) {
-    const adaptedOffers = [];
-
-    for (let i = 0; i < offers.offers.length; i++) {
-      adaptedOffers.push(Object.assign(
-        {},
-        offers.offers[i],
-        {
-          isChecked: offers.offers[i].isChecked,
-        },
-      ));
-    }
-
-    return {
-      type: offers.type,
-      offers: adaptedOffers,
-    };
-  }
 }

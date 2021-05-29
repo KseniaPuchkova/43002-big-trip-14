@@ -114,13 +114,12 @@ const createRollUpButton = (isPointNew) => {
   );
 };
 
-const createEditPointTemplate = (data = {}, destinations, availableOffers) => {
+const createEditPointTemplate = (data = {}, destinations, availableOffersByType) => {
   const {start, end, destination, type, price, offers, isNew, isDisabled, isSaving, isDeleting} = data;
 
   const destinationNames = destinations.map((destination) => destination.name);
   const destinationsList = createDestinationsMarkup(destinationNames);
   const destinationMarkup = generateDestinationMarkup(destination);
-  const availableOffersByType = availableOffers.find((offer) => offer.type === type).offers;
   const offersListContainer = createOffersMarkup(availableOffersByType, offers, isDisabled);
   const transfersList = createTypesMarkup(type, Object.values(Transfer));
   const activitiesList = createTypesMarkup(type, Object.values(Activity));
@@ -221,7 +220,7 @@ export default class EditPoint extends SmartView {
   }
 
   getTemplate() {
-    return createEditPointTemplate(this._stateData, this._destinations, this._availableOffers);
+    return createEditPointTemplate(this._stateData, this._destinations, this._availableOffersByType);
   }
 
   setButtonCloseClickHandler(callback) {
@@ -405,7 +404,7 @@ export default class EditPoint extends SmartView {
 
     this.updateState({
       offers: checkedOffers,
-    });
+    }, false);
   }
 
   _priceInputHandler(evt) {
