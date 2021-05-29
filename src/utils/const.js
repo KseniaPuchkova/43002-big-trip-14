@@ -1,17 +1,24 @@
 import {addDays} from '../utils/date.js';
 
-const STORE_PREFIX = 'big-trip-localstorage';
-const STORE_VER = 'v14';
-export const AUTHORIZATION = 'Basic 7RUkyeQDQt6JBhJZOo17a';
-export const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
-
-export const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
-
 export const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const SHOW_TIME = 5000;
 
 export const BAR_HEIGHT = 55;
+
+const STORE_VER = 'v14';
+export const AUTHORIZATION = 'Basic 7RUkyeQDQt6JBhJZOo17a';
+export const END_POINT = 'https://14.ecmascript.pages.academy/big-trip';
+
+export const StorePrefix = {
+  POINTS: 'big-trip-points-localstorage',
+  OFFERS: 'big-trip-offers-localstorage',
+  DESTINATIONS: 'big-trip-destinations-localstorage',
+};
+
+export const POINTS_STORE_NAME = `${StorePrefix.POINTS}-${STORE_VER}`;
+export const OFFERS_STORE_NAME = `${StorePrefix.OFFERS}-${STORE_VER}`;
+export const DESTINATIONS_STORE_NAME = `${StorePrefix.DESTINATIONS}-${STORE_VER}`;
 
 export const BLANK_POINT = {
   isNew: true,

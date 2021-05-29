@@ -1,4 +1,5 @@
 import PointsModel from '../model/points.js';
+import DestinationsModel from '../model/destinations.js';
 import {isOnline} from '../utils/common.js';
 
 const getSyncedPoints = (items) => {
@@ -15,9 +16,11 @@ const createStoreStructure = (items) => {
 };
 
 export default class Provider {
-  constructor(api, pointsStore) {
+  constructor(api, pointsStore, offersStore, destinationsStore) {
     this._api = api;
     this._pointsStore = pointsStore;
+    this._offersStore = offersStore;
+    this._destinationsStore = destinationsStore;
   }
 
   getPoints() {
@@ -33,6 +36,32 @@ export default class Provider {
     const storePoints = Object.values(this._pointsStore.getItems());
 
     return Promise.resolve(storePoints.map(PointsModel.adaptToClient));
+  }
+
+  getDestinations() {
+    if (isOnline()) {
+      return this._api.getDestinations()
+        .then((destinations) => {
+          this._destinationsStore.setItems(destinations);
+          return destinations;
+        });
+    }
+
+    const storeDestinations = this._destinationsStore.getItems();
+
+    return Promise.resolve(storeDestinations.map(DestinationsModel.adaptToClient));
+  }
+
+  getOffers() {
+    if (isOnline()) {
+      return this._api.getOffers()
+        .then((offers) => {
+          this._offersStore.setItems(offers);
+          return offers;
+        });
+    }
+
+    return Promise.resolve(this._offersStore.getItems());
   }
 
   updatePoint(point) {

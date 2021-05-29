@@ -7,7 +7,7 @@ import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import DestinationsModel from './model/destinations.js';
 import OffersModel from './model/offers.js';
-import {AUTHORIZATION, END_POINT, STORE_NAME, RenderPosition, UpdateType, MenuItem} from './utils/const.js';
+import {AUTHORIZATION, END_POINT, POINTS_STORE_NAME, OFFERS_STORE_NAME, DESTINATIONS_STORE_NAME, RenderPosition, UpdateType, MenuItem} from './utils/const.js';
 import {isOnline} from './utils/common.js';
 import {render, remove} from './utils/render.js';
 import {toastMessage} from './utils/message.js';
@@ -16,8 +16,11 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 
 const api = new Api(END_POINT, AUTHORIZATION);
-const pointsStore = new Store(STORE_NAME, window.localStorage);
-const apiWithProvider = new Provider(api, pointsStore);
+const pointsStore = new Store(POINTS_STORE_NAME, window.localStorage);
+const offersStore = new Store(OFFERS_STORE_NAME, window.localStorage);
+const destinationsStore = new Store(DESTINATIONS_STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, pointsStore, offersStore, destinationsStore);
+
 
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
@@ -75,8 +78,8 @@ const handleSiteMenuClick = (menuItem) => {
 
 Promise
   .all([
-    api.getOffers(),
-    api.getDestinations(),
+    apiWithProvider.getOffers(),
+    apiWithProvider.getDestinations(),
     apiWithProvider.getPoints(),
   ])
   .then(([offers, destinations,  points]) => {
